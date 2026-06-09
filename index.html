@@ -1,0 +1,1863 @@
+import { useState, useEffect } from "react";
+
+const CHARACTERS = [
+  // ROMANCEABLE
+  {
+    name: "Aaliyah", romanceable: true, category: "Townie",
+    events: [
+      { heart: 3, location: "In front of Sam's", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 5, location: "Fishensips", time: "18:00–23:59", weather: "Any", season: "Any", notes: "" },
+      { heart: 6, location: "Fishensips", time: "09:00–15:00", weather: "Any", season: "Any", notes: "" },
+      { heart: "6b", location: "Graveyard", time: "09:00–17:00", weather: "Any", season: "Any", notes: "SDT: Yes" },
+      { heart: 7, location: "In front of Fishensips", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: "7b", location: "Garden Lane", time: "06:00–13:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Fishensips", time: "18:00–23:59", weather: "Any", season: "Any", notes: "" },
+      { heart: "8b", location: "Hot Spring / Bamboo Forest", time: "09:00–17:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 10, location: "Beach", time: "09:00–15:00", weather: "Sunny", season: "Any", notes: "Not available Winter 17–21" },
+    ]
+  },
+  {
+    name: "Alice", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Coral Inn", time: "10:00–17:00", weather: "Any", season: "Any", notes: "SDT: Yes" },
+      { heart: 4, location: "Beach Pier", time: "18:00–22:00", weather: "Sunny", season: "Any", notes: "Not available Winter 17–21" },
+      { heart: 5, location: "Coral Inn", time: "10:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 6, location: "Community Center", time: "09:00–17:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 7, location: "Fishensips", time: "18:00–23:59", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Coral Inn (kitchen)", time: "08:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Beach Pier", time: "19:00–23:59", weather: "Sunny", season: "Any", notes: "Not available Winter 17–21" },
+      { heart: "10b", location: "Coral Inn kitchen", time: "19:00–23:59", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Ben", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Caravan", time: "08:00–17:00", weather: "Sunny/Windy", season: "Any", notes: "SDT: Yes; Not available Fall 15–28" },
+      { heart: 3, location: "Caravan", time: "08:00–17:00", weather: "Sunny/Windy", season: "Any", notes: "Not available Fall 15–28" },
+      { heart: 4, location: "Caravan", time: "08:00–17:00", weather: "Sunny/Windy", season: "Any", notes: "Not available Fall 15–28" },
+      { heart: 5, location: "Outside the Mine", time: "08:00–17:00", weather: "Sunny/Windy", season: "Any", notes: "Not available Fall 15–28" },
+      { heart: 6, location: "Caravan", time: "08:00–17:00", weather: "Sunny/Windy", season: "Any", notes: "Not available Fall 15–28" },
+      { heart: 7, location: "Clinic", time: "10:00–17:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: 8, location: "Lake", time: "17:00–19:00", weather: "Sunny/Windy", season: "Any", notes: "Not available Fall 15–28" },
+      { heart: 10, location: "Forest near the Caravan", time: "18:00–23:59", weather: "Sunny/Windy", season: "Any", notes: "Not available Fall 15–28" },
+    ]
+  },
+  {
+    name: "Chaem", romanceable: true, category: "Townie",
+    events: [
+      { heart: 3, location: "Beach", time: "07:00–13:00", weather: "Sunny", season: "Spring/Summer/Fall", notes: "SDT: Yes" },
+      { heart: 5, location: "Outside the Observatory", time: "09:00–15:00", weather: "Sunny/Windy", season: "Spring/Summer/Fall", notes: "" },
+      { heart: 6, location: "Fishensips", time: "18:00–23:59", weather: "Any", season: "Spring/Summer/Fall", notes: "" },
+      { heart: 7, location: "Beach", time: "12:00–13:00", weather: "Sunny", season: "Spring/Summer/Fall", notes: "" },
+      { heart: "7b", location: "Observatory", time: "18:00–23:59", weather: "Any", season: "Spring/Summer/Fall", notes: "SDT: Yes" },
+      { heart: 8, location: "Blacksmith Garage", time: "09:00–14:00", weather: "Any", season: "Spring/Summer/Fall", notes: "" },
+      { heart: "8b", location: "Fishensips", time: "12:00–23:59", weather: "Any", season: "Spring/Summer/Fall", notes: "" },
+      { heart: 10, location: "Inside the Hot Spring", time: "18:00–23:59", weather: "Sunny", season: "Spring/Summer/Fall", notes: "" },
+    ]
+  },
+  {
+    name: "Charles", romanceable: true, category: "Townie",
+    events: [
+      { heart: 1, location: "Clinic", time: "10:00–17:00", weather: "Any", season: "Any", notes: "SDT: Yes" },
+      { heart: 2, location: "Farm", time: "06:00–23:59", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 3, location: "Center of town", time: "09:00–14:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: "3b", location: "Town park", time: "08:00–14:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 5, location: "Hair Salon", time: "12:00–17:00", weather: "Any", season: "Any", notes: "Sunday only" },
+      { heart: 6, location: "Scott & Charles' House", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 7, location: "Beach Shack", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Mon/Wed–Sun; Not available Winter 17–21" },
+      { heart: 8, location: "Scott & Charles' House", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: "8b", location: "Scott & Charles' House", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "School", time: "09:00–16:00", weather: "Any", season: "Any", notes: "" },
+      { heart: "10b", location: "Outside Emma & Dippa's House", time: "09:00–17:00", weather: "Any", season: "Any", notes: "SDT: Yes" },
+    ]
+  },
+  {
+    name: "Eva", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Sam's General Store", time: "14:00–17:00", weather: "Any", season: "Any", notes: "SDT: Yes; Mon/Tue/Thu–Sun" },
+      { heart: 4, location: "Coral Inn kitchen", time: "18:00–22:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 5, location: "Coral Inn kitchen", time: "18:00–22:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 6, location: "Fishensips", time: "09:00–20:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 7, location: "Coral Inn", time: "09:00–20:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Beach Pier", time: "07:00–14:00", weather: "Sunny/Windy", season: "Any", notes: "Not available Winter 17–21" },
+      { heart: "8b", location: "Coral Inn", time: "07:00–20:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Coral Inn", time: "07:00–20:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Kenny", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Outside the Ranch", time: "08:00–16:00", weather: "Rainy", season: "Any", notes: "SDT: Yes" },
+      { heart: 3, location: "Outside Jack, Kira & Kenny's House", time: "09:00–16:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: 5, location: "Forest ruins", time: "09:00–16:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: 6, location: "In front of Fishensips", time: "18:00–23:59", weather: "Rainy/Stormy", season: "Any", notes: "" },
+      { heart: 7, location: "Lake", time: "08:00–16:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 8, location: "Forest ruin", time: "18:00–23:59", weather: "Any", season: "Any", notes: "" },
+      { heart: "8b", location: "Forest ruin", time: "09:00–16:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Farm", time: "06:00–23:59", weather: "Sunny", season: "Any", notes: "" },
+      { heart: "10b", location: "Farm", time: "06:00–23:59", weather: "Sunny", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Leah", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Leah, Ling & Randy's House", time: "10:00–14:00", weather: "Any", season: "Any", notes: "Special project, asks for help" },
+      { heart: 3, location: "Beach", time: "10:00–14:00", weather: "Any", season: "Any", notes: "Not available Winter 17–21" },
+      { heart: 4, location: "Community Center (yoga)", time: "10:00–14:00", weather: "Any", season: "Any", notes: "Saturday only" },
+      { heart: 6, location: "Lake", time: "08:00–16:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: "6b", location: "Beach", time: "09:00–15:00", weather: "Sunny", season: "Any", notes: "Not available Winter 17–21 or Fall 15–28" },
+      { heart: 7, location: "Outside Leah, Ling & Randy's House", time: "09:00–15:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: "7b", location: "Little Island at the Lake", time: "10:00–14:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: 8, location: "Fishensips", time: "12:00–16:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Forest path", time: "12:00–14:00", weather: "Sunny", season: "Spring/Summer/Fall", notes: "" },
+    ]
+  },
+  {
+    name: "Lily", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Lily, Jim & Theo's House", time: "18:00–20:00", weather: "Any", season: "Any", notes: "Jim worried about Lily" },
+      { heart: 3, location: "Beach Shack", time: "13:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 6, location: "Lake", time: "09:00–15:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: 7, location: "Museum (level 2 required)", time: "06:00–16:50", weather: "Any", season: "Any", notes: "⚠️ Museum must be level 2; then go to Villa at night" },
+      { heart: "7b", location: "Villa/Beach Area", time: "18:00–23:59", weather: "Any", season: "Any", notes: "Follow-up to museum event" },
+      { heart: 8, location: "Farm", time: "06:00–23:59", weather: "Any", season: "Any", notes: "" },
+      { heart: "8b", location: "Lily's room", time: "09:00–20:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Lily's room", time: "09:00–20:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Luke", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Farm", time: "06:00–23:59", weather: "Any", season: "Any", notes: "Luke looking for Taco" },
+      { heart: "2b", location: "Hillside Manor Vineyard", time: "11:00–16:00", weather: "Any", season: "Any", notes: "Still looking for Taco" },
+      { heart: 3, location: "Beach", time: "06:01–23:00", weather: "Any", season: "Any", notes: "Player finds Taco" },
+      { heart: "3b", location: "Socket and Pan", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Walter visits Luke's store" },
+      { heart: "3c", location: "Socket and Pan", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Discussion of previous event" },
+      { heart: 4, location: "Socket and Pan", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Walter working at Luke's store" },
+      { heart: 6, location: "Socket and Pan", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: "6b", location: "Socket and Pan", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 7, location: "Socket and Pan", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Socket and Pan", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Lake Area", time: "18:00–21:00", weather: "Sunny", season: "Spring/Summer/Fall", notes: "" },
+    ]
+  },
+  {
+    name: "Macy", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Lookout", time: "10:00–16:00", weather: "Sunny", season: "Any", notes: "Macy taking selfie" },
+      { heart: 4, location: "Little Island at the Lake", time: "10:00–16:00", weather: "Sunny", season: "Any", notes: "Meets pet lobster Stephen" },
+      { heart: 6, location: "Beach", time: "10:00–17:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 7, location: "Macy's room at Coral Inn", time: "18:00–23:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 9, location: "Western Beach", time: "18:00–19:00", weather: "Sunny", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Millie", romanceable: true, category: "Townie",
+    events: [
+      { heart: 1, location: "Lake", time: "10:00–16:00", weather: "Sunny", season: "Any", notes: "Throwing flowers hoping Goddess appears" },
+      { heart: 4, location: "Community Center library", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Slips while moving boxes" },
+      { heart: 5, location: "Community Center library", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Writing advice" },
+      { heart: 6, location: "Garden Lane", time: "07:00–12:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 7, location: "Farm", time: "06:00–12:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Garden Lane", time: "09:00–16:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Farm", time: "06:00–12:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Nina", romanceable: true, category: "Townie",
+    events: [
+      { heart: 3, location: "Farm", time: "06:00–23:59", weather: "Sunny/Windy", season: "Any", notes: "Talking about player's farm" },
+      { heart: 5, location: "Community Center library", time: "07:00–16:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 6, location: "Community Center library", time: "07:00–16:00", weather: "Any", season: "Any", notes: "" },
+      { heart: "6b", location: "In front of Fishensips", time: "08:00–17:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: 7, location: "Abandoned Villa", time: "18:00–23:59", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Abandoned Villa", time: "09:00–20:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Near Millie's House", time: "15:00–17:00", weather: "Sunny", season: "Spring/Summer/Fall", notes: "⚠️ Known buggy – must receive letter from Nina after 8♥ event first" },
+    ]
+  },
+  {
+    name: "Noah", romanceable: true, category: "Townie",
+    events: [
+      { heart: 1, location: "Lake", time: "10:00–13:00", weather: "Sunny", season: "Any", notes: "Noah and mother walk by lake" },
+      { heart: 3, location: "Fishensips", time: "10:00–13:00", weather: "Any", season: "Any", notes: "⚠️ Bring 2 flowers in inventory – letter triggers visit" },
+      { heart: 4, location: "Community Center library", time: "10:00–15:00", weather: "Any", season: "Any", notes: "Wednesday only" },
+      { heart: 5, location: "Fishensips", time: "14:00–23:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 6, location: "Garden Lane", time: "10:00–13:00", weather: "Sunny", season: "Any", notes: "⚠️ Receive letter, go to Garden Lane next morning to chop wood" },
+      { heart: 7, location: "Fishensips", time: "10:00–18:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "In front of Fishensips", time: "06:00–11:00", weather: "Sunny", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Pablo", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Town center", time: "10:00–13:00", weather: "Sunny", season: "Any", notes: "Town thanks Pablo" },
+      { heart: 4, location: "Blacksmith", time: "14:00–18:00", weather: "Any", season: "Any", notes: "Pablo invites Rafael and player to pool" },
+      { heart: 6, location: "Blacksmith", time: "14:00–18:00", weather: "Any", season: "Any", notes: "" },
+      { heart: "7a", location: "Blacksmith", time: "16:00–18:00", weather: "Any", season: "Any", notes: "" },
+      { heart: "7b", location: "In front of the Blacksmith", time: "06:00–15:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 8, location: "Blacksmith", time: "16:00–18:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Beach Pier", time: "19:00–21:00", weather: "Sunny", season: "Any", notes: "Not available Winter 17–21" },
+    ]
+  },
+  {
+    name: "Rafael", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Coral Inn", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Saturday or Sunday; Rafael takes Valentina for cake" },
+      { heart: 3, location: "Sanchez Brothers Blacksmith", time: "09:00–20:00", weather: "Any", season: "Any", notes: "Story about rare ore" },
+      { heart: 5, location: "In front of the Blacksmith", time: "10:00–17:00", weather: "Sunny", season: "Any", notes: "Rare ore arrives" },
+      { heart: 6, location: "Blacksmith", time: "09:00–20:00", weather: "Any", season: "Any", notes: "Forging the legendary hammer" },
+      { heart: 7, location: "Blacksmith", time: "09:00–20:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 9, location: "Blacksmith", time: "09:00–20:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Raj", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Raja's Coffee Corner", time: "08:00–18:00", weather: "Sunny/Windy", season: "Any", notes: "Free drink!" },
+      { heart: 4, location: "Community Center", time: "18:00–22:00", weather: "Any", season: "Any", notes: "First Chamber of Commerce meeting" },
+      { heart: 5, location: "Farm", time: "06:00–23:59", weather: "Any", season: "Any", notes: "Flyer for coffee shop" },
+      { heart: "5b", location: "Raja's Coffee Corner", time: "08:00–18:00", weather: "Sunny/Windy", season: "Any", notes: "Shop full of customers" },
+      { heart: 6, location: "Raja's Coffee Corner", time: "08:00–18:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: 7, location: "Raja's Coffee Corner", time: "08:00–18:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: 8, location: "Raja's Coffee Corner", time: "08:00–18:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: "8b", location: "Raja's Coffee Corner", time: "08:00–18:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: 10, location: "Farm", time: "06:00–23:59", weather: "Any", season: "Any", notes: "" },
+      { heart: "10b", location: "Fishensips", time: "18:00–23:59", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Scott", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Community Center library", time: "10:00–13:00", weather: "Any", season: "Any", notes: "Scott crashed Millie's computer" },
+      { heart: 3, location: "Pier by Zarah's Boat", time: "10:00–14:00", weather: "Sunny", season: "Any", notes: "Looking for Lily" },
+      { heart: 5, location: "Park in front of the Laboratory", time: "08:00–13:00", weather: "Sunny", season: "Any", notes: "Talks about island history" },
+      { heart: 7, location: "Fishensips", time: "12:00–23:59", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Lake Area", time: "08:00–15:00", weather: "Sunny/Windy", season: "Any", notes: "" },
+      { heart: "8b", location: "1 Main Ave", time: "19:00–23:59", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Museum", time: "19:00–03:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Suki", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Western Beach", time: "18:00–21:00", weather: "Sunny", season: "Any", notes: "Unsigned letter; Not available Winter 17–21 or Fall 15–28" },
+      { heart: 4, location: "Beach Pier", time: "06:00–12:00", weather: "Sunny", season: "Any", notes: "Thursday; Not available Winter 17–21; Meeting Antonio" },
+      { heart: 6, location: "Western Beach", time: "09:00–13:00", weather: "Sunny", season: "Any", notes: "Mon–Thu; Not available Winter 17–21" },
+      { heart: 7, location: "Fishensips", time: "18:00–23:59", weather: "Any", season: "Any", notes: "Suki talks about Antonio" },
+      { heart: 8, location: "Western Beach", time: "09:00–13:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 10, location: "Beach / Pier", time: "18:00–21:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Surya", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Carpenter", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Dinda asks Surya to fix TV" },
+      { heart: 3, location: "Carpenter", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Surya unusually happy" },
+      { heart: "3b", location: "Carpenter", time: "09:00–17:00", weather: "Any", season: "Any", notes: "SDT: Yes; Surya asks for advice" },
+      { heart: 5, location: "Ranch area", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Considers moving to Ranch" },
+      { heart: 6, location: "Laboratory", time: "07:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Beach", time: "06:00–14:00", weather: "Sunny", season: "Any", notes: "Not available Winter 17–21" },
+      { heart: 10, location: "Lake / Observation area", time: "18:00–23:59", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Theo", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Community Center", time: "12:00–17:00", weather: "Any", season: "Any", notes: "Playing guitar" },
+      { heart: 3, location: "Community Center", time: "12:00–17:00", weather: "Sunny", season: "Any", notes: "SDT: Yes; Looking for old piano; Not available Fall 15–28" },
+      { heart: 4, location: "Recycling Center", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Searches for piano" },
+      { heart: "4b", location: "Garden Lane / Theo's area", time: "08:00–12:00", weather: "Any", season: "Any", notes: "⚠️ Bring 3 wood in inventory; quest to fix piano" },
+      { heart: 7, location: "Lily, Jim & Theo's House", time: "08:00–12:00", weather: "Sunny", season: "Any", notes: "⚠️ Arrive BEFORE 8am and wait" },
+      { heart: 8, location: "Garden area", time: "06:00–23:59", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Family home / Dinner", time: "18:00–22:00", weather: "Any", season: "Any", notes: "Letter received; invited to dinner" },
+    ]
+  },
+  {
+    name: "Wakuu", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Observatory or Lighthouse", time: "11:00–17:00", weather: "Any", season: "Any", notes: "Lunch with Wataru; Suki stops by" },
+      { heart: 3, location: "Observatory", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Wakuu talks about relationship with father" },
+      { heart: 5, location: "Observatory", time: "18:00–23:59", weather: "Any", season: "Any", notes: "Telescope – Takeba confuses Mark for son" },
+      { heart: 6, location: "Lighthouse / fishing area", time: "07:00–16:00", weather: "Any", season: "Any", notes: "Wakuu and Wataru fishing" },
+      { heart: 7, location: "Lighthouse", time: "10:00–17:00", weather: "Any", season: "Any", notes: "Player talks to Wataru about son" },
+      { heart: 8, location: "Observatory", time: "19:00–23:59", weather: "Any", season: "Any", notes: "Meteor shower event; Not available Winter 17–21" },
+      { heart: 10, location: "Observatory / outside", time: "18:00–23:59", weather: "Any", season: "Any", notes: "Not available Winter 17–21" },
+    ]
+  },
+  {
+    name: "Yuri", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Clinic", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 4, location: "Clinic", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 6, location: "Clinic", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Outside Clinic", time: "07:00–14:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 10, location: "Farm", time: "06:00–23:59", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Zarah", romanceable: true, category: "Townie",
+    events: [
+      { heart: 2, location: "Zarah's Boat Pier", time: "07:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 4, location: "Zarah's Boat Pier", time: "07:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 6, location: "Zarah's Boat Pier", time: "07:00–17:00", weather: "Sunny", season: "Any", notes: "⚠️ Requires Treasure Map 2nd & 3rd piece in inventory" },
+      { heart: 7, location: "Zarah's Boat Pier", time: "07:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Beach / Ocean area", time: "07:00–17:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 10, location: "Beach", time: "18:00–23:59", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  // Merfolk
+  {
+    name: "Semeru", romanceable: true, category: "Merfolk",
+    events: [
+      { heart: 2, location: "Naga Palace (upper level)", time: "07:00–17:00", weather: "Any", season: "Any", notes: "Deno & Agung talking about Poseidon (Semeru's pet)" },
+      { heart: 4, location: "Beach area", time: "07:00–17:00", weather: "Any", season: "Any", notes: "Search for Poseidon with Semeru" },
+      { heart: 6, location: "Naga Palace", time: "09:00–20:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Naga Palace", time: "09:00–20:00", weather: "Any", season: "Any", notes: "⚠️ Known bug – may not trigger; send save file to devs" },
+      { heart: 10, location: "Naga Palace", time: "09:00–20:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  // Non-romanceable townies with events
+  {
+    name: "Anne", romanceable: false, category: "Townie",
+    events: [
+      { heart: 2, location: "Lake", time: "10:00–15:00", weather: "Rainy", season: "Any", notes: "Wounded animal" },
+      { heart: 4, location: "Zoe, Anne & Paul's House", time: "09:00–20:00", weather: "Any", season: "Any", notes: "Looking for bracelet" },
+      { heart: 6, location: "Forest (Farm)", time: "08:00–12:00", weather: "Any", season: "Any", notes: "Searching for raccoon" },
+      { heart: 7, location: "Garden Lane", time: "12:00–17:00", weather: "Any", season: "Any", notes: "Watches raccoons at river" },
+      { heart: 8, location: "Upper part of town", time: "07:00–15:00", weather: "Any", season: "Any", notes: "Helps Barney win over Sheila" },
+      { heart: 10, location: "Garden Lane", time: "12:00–17:00", weather: "Any", season: "Any", notes: "Anne and Barney try one last thing" },
+    ]
+  },
+  {
+    name: "Antonio", romanceable: false, category: "Townie",
+    events: [
+      { heart: 4, location: "White Flamingo", time: "09:00–16:00", weather: "Any", season: "Any", notes: "Asks for love advice" },
+      { heart: 6, location: "Coral Inn", time: "08:00–14:00", weather: "Sunny", season: "Any", notes: "Antonio and Suki discuss relationship" },
+      { heart: 7, location: "Farm", time: "06:00–23:59", weather: "Sunny/Windy", season: "Any", notes: "Suki talks about Antonio event" },
+      { heart: 8, location: "Fishensips", time: "17:00–21:00", weather: "Any", season: "Any", notes: "Antonio and Suki confess feelings" },
+      { heart: 10, location: "White Flamingo", time: "09:00–20:00", weather: "Any", season: "Any", notes: "Antonio takes Suki's advice" },
+    ]
+  },
+  {
+    name: "Betty", romanceable: false, category: "Townie",
+    events: [
+      { heart: 2, location: "Fishensips", time: "11:00–17:00", weather: "Any", season: "Any", notes: "Talks about visiting late father" },
+      { heart: 5, location: "Graveyard", time: "08:00–12:00", weather: "Any", season: "Any", notes: "Family celebration" },
+      { heart: 7, location: "Beach Pier", time: "17:00–19:00", weather: "Any", season: "Any", notes: "Not available Winter 17–21" },
+      { heart: 8, location: "Community Center (Library)", time: "13:00–18:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Fishensips", time: "10:00–18:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Bree", romanceable: false, category: "Townie",
+    events: [
+      { heart: 2, location: "Hillside Manor Vineyard", time: "10:00–17:00", weather: "Sunny/Windy", season: "Any", notes: "Walter and Bree arguing" },
+      { heart: 4, location: "Hillside Manor Vineyard", time: "10:00–17:00", weather: "Sunny/Windy", season: "Any", notes: "Apologize to player" },
+      { heart: 5, location: "Hillside Manor Vineyard", time: "16:00–18:00", weather: "Sunny/Windy", season: "Any", notes: "Discussing cleaning the attic" },
+      { heart: 6, location: "Recycling Center", time: "18:00–21:00", weather: "Sunny/Windy", season: "Any", notes: "⚠️ 6+ events currently not enabled" },
+    ]
+  },
+  {
+    name: "Dinda", romanceable: false, category: "Townie",
+    events: [
+      { heart: 3, location: "Carpenter", time: "09:00–17:00", weather: "Any", season: "Any", notes: "Chatting with Joko over lunch" },
+      { heart: 4, location: "Carpenter", time: "14:00–17:00", weather: "Any", season: "Any", notes: "Archie asks Dinda for help" },
+      { heart: 6, location: "Carpenter", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 7, location: "Carpenter", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 8, location: "Carpenter", time: "17:00–20:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 9, location: "Forest (Monkey Tree)", time: "07:00–15:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Carpenter Yard", time: "07:00–15:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Emma", romanceable: false, category: "Townie",
+    events: [
+      { heart: 2, location: "Sam's General Store", time: "11:00–14:00", weather: "Any", season: "Any", notes: "Forgot birthday cake" },
+      { heart: 5, location: "Outside Emma's Taco Truck", time: "11:00–16:00", weather: "Any", season: "Any", notes: "Sam and Emily helping with truck" },
+      { heart: 6, location: "Outside Emma's Taco Truck", time: "11:00–16:00", weather: "Sunny", season: "Any", notes: "" },
+      { heart: 9, location: "Farm", time: "06:00–23:59", weather: "Sunny", season: "Any", notes: "" },
+      { heart: "9b", location: "Emma & Dippa's House", time: "17:00–20:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Erika", romanceable: false, category: "Townie",
+    events: [
+      { heart: 2, location: "Frank & Erika's House", time: "18:00–20:00", weather: "Any", season: "Any", notes: "Dinner invite" },
+      { heart: 4, location: "In front of Fishensips", time: "09:00–12:00", weather: "Sunny", season: "Any", notes: "Picking up wine from vineyard" },
+      { heart: "4b", location: "Hillside Manor Vineyard", time: "11:00–16:00", weather: "Sunny", season: "Any", notes: "Picks up wine, chats with Bree" },
+      { heart: 8, location: "Frank & Erika's House", time: "09:00–14:00", weather: "Any", season: "Any", notes: "" },
+      { heart: "8b", location: "Community Center (Library)", time: "11:00–16:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 10, location: "Frank & Erika's House", time: "09:00–14:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Jack", romanceable: false, category: "Townie",
+    events: [
+      { heart: 2, location: "Jack, Kira & Kenny's House", time: "18:00–20:00", weather: "Any", season: "Any", notes: "New dish to try" },
+      { heart: 4, location: "Ranch", time: "08:00–15:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 6, location: "Fishensips", time: "12:00–17:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 7, location: "Outside the Ranch", time: "07:00–13:00", weather: "Any", season: "Any", notes: "Not available Fall 15–28" },
+      { heart: 8, location: "Ranch", time: "08:00–15:00", weather: "Any", season: "Any", notes: "" },
+      { heart: 9, location: "Ranch", time: "08:00–15:00", weather: "Any", season: "Any", notes: "Not available Fall 15–28" },
+      { heart: 10, location: "Jack, Kira & Kenny's House", time: "08:00–16:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+  {
+    name: "Joko", romanceable: false, category: "Townie",
+    events: [
+      { heart: 2, location: "Carpenter", time: "09:00–16:00", weather: "Any", season: "Any", notes: "Letter found in room" },
+      { heart: 3, location: "Community Center", time: "11:00–17:00", weather: "Sunny", season: "Any", notes: "Meeting Connor about electricity" },
+      { heart: 5, location: "Carpenter", time: "09:00–14:00", weather: "Any", season: "Any", notes: "Shares feelings about job" },
+      { heart: 6, location: "Beach", time: "06:00–14:00", weather: "Sunny", season: "Any", notes: "Not available Winter 17–21; ⚠️ 6+ may not be enabled" },
+    ]
+  },
+  {
+    name: "Mark", romanceable: false, category: "Townie",
+    events: [
+      { heart: 3, location: "Outside the cavern", time: "18:00–23:59", weather: "Any", season: "Any", notes: "Rescues stray dog" },
+      { heart: 4, location: "Community Center Animal Shelter", time: "09:00–15:00", weather: "Any", season: "Any", notes: "Socializing the stray; accident!" },
+      { heart: 6, location: "Fishensips", time: "12:00–17:00", weather: "Any", season: "Any", notes: "Mark reveals a secret" },
+      { heart: "6b", location: "Outside the Huntress Cabin", time: "09:00–15:00", weather: "Any", season: "Any", notes: "Stray has run away!" },
+      { heart: 7, location: "Outside the cavern", time: "18:00–23:59", weather: "Any", season: "Any", notes: "Looking dirty – where's his stray?" },
+      { heart: 9, location: "Lake", time: "08:00–16:00", weather: "Any", season: "Any", notes: "Reunited with stray! Promises made." },
+    ]
+  },
+  {
+    name: "Sunny", romanceable: false, category: "Townie",
+    events: [
+      { heart: 2, location: "Sunny's House / TV area", time: "12:00–17:00", weather: "Any", season: "Any", notes: "Watching fishing competition on TV" },
+      { heart: 3, location: "Starlet Elementary School", time: "07:00–09:00", weather: "Any", season: "Any", notes: "Picking up Oliver at school" },
+      { heart: 5, location: "Sunny's House area", time: "09:00–17:00", weather: "Any", season: "Any", notes: "" },
+    ]
+  },
+];
+
+const STORAGE_KEY = "ci_scene_tracker_v2";
+const MUSEUM_STORAGE_KEY = "ci_museum_tracker_v1";
+
+// ── MUSEUM DATA ──────────────────────────────────────────────────────────────
+
+const MUSEUM_MILESTONES = [
+  { count: 1, reward: "Complete Empty No More quest" },
+  { count: 5, reward: "Candied Tree Seed ×3" },
+  { count: 10, reward: "Potato Seeds ×8 + unlocks Museum Expansion quest" },
+  { count: 20, reward: "Glass ×20" },
+  { count: 30, reward: "Bronze Ore ×5 + Bronze Kelp ×10" },
+  { count: 40, reward: "Tap" },
+  { count: 50, reward: "Sprinkler I + completes Museum Expansion (Soft Bristle Brush unlocked!)" },
+  { count: 60, reward: "Explosive I ×5 + Vortexanator I ×5" },
+  { count: 70, reward: "Dragonfruit Seedling" },
+  { count: 80, reward: "Silver Ore ×5 + Silver Kelp ×10" },
+  { count: 90, reward: "Pumpkin Seeds ×8" },
+  { count: 100, reward: "Fish Taco ×5" },
+  { count: 120, reward: "Javanese Bed + Javanese Chair + Javanese Small Table" },
+  { count: 140, reward: "Snowdrop Seeds ×10" },
+  { count: 160, reward: "Gold Ore ×5 + Gold Kelp ×10" },
+  { count: 180, reward: "Rope ×5" },
+  { count: 200, reward: "Stamina Fruit" },
+  { count: 225, reward: "Beach Gazebo" },
+  { count: 250, reward: "Explosive III ×5 + Vortexanator III ×5" },
+  { count: 275, reward: "Osmium Ore ×5 + Osmium Kelp ×10" },
+  { count: 300, reward: "Auto SFH" },
+  { count: 325, reward: "Prickly Backpack" },
+  { count: 340, reward: "Magical Unicorn Suit + Part-Time Curator badge" },
+];
+
+const MUSEUM_COLLECTIONS = [
+  { id: "fossils", name: "Fossil Collection", total: 60, reward: "Dino Suit + Paleontologist badge", icon: "🦕" },
+  { id: "insects", name: "Insect Collection", total: 53, reward: "Moth Suit + Bugs Enjoyer badge", icon: "🦋" },
+  { id: "fish", name: "Fish Collection", total: 69, reward: "Dapper Octopus Suit + Fishing Mania badge", icon: "🐟" },
+  { id: "critters", name: "Critters Collection", total: 45, reward: "Seafarer Outfit + Marine Observer badge", icon: "🦀" },
+  { id: "artifacts", name: "Artifact Collection", total: 78, reward: "Shoulder Belt Top + Memento of the Past badge", icon: "🏺" },
+  { id: "gems", name: "Gem Collection", total: 35, reward: "Chieftain Statue + Bejeweled badge", icon: "💎" },
+  { id: "sharks", name: "Sharks Collection", total: 3, reward: "Shark Suit", icon: "🦈" },
+  { id: "vintage", name: "Vintage Artifacts", total: 5, reward: "Judge Wig", icon: "⚖️" },
+];
+
+const FOSSILS = [
+  // Brontosaurus (Large node)
+  { name: "Brontosaurus Skull", creature: "Brontosaurus", source: "Large Node", how: "Till soil with hoe, break large rocks in Cavern/Cave of Memories, Black Market" },
+  { name: "Brontosaurus Spine", creature: "Brontosaurus", source: "Large Node", how: "Till soil with hoe, break large rocks in Cavern/Cave of Memories, Black Market" },
+  { name: "Brontosaurus Torso", creature: "Brontosaurus", source: "Large Node", how: "Till soil with hoe, break large rocks in Cavern/Cave of Memories, Black Market" },
+  { name: "Brontosaurus Leg", creature: "Brontosaurus", source: "Large Node", how: "Till soil with hoe, break large rocks in Cavern/Cave of Memories, Black Market" },
+  { name: "Brontosaurus Tail", creature: "Brontosaurus", source: "Large Node", how: "Till soil with hoe, break large rocks in Cavern/Cave of Memories, Black Market" },
+  { name: "Brontosaurus Prints", creature: "Brontosaurus", source: "Cave of Memories", how: "Cave of Memories quest (Dino Prints) — requires all fossils donated + Town Rank A" },
+  // T-Rex (Large node)
+  { name: "Tyrannosaurus Skull", creature: "Tyrannosaurus", source: "Large Node", how: "Till soil with hoe, break large rocks in Cavern/Cave of Memories, Black Market" },
+  { name: "Tyrannosaurus Spine", creature: "Tyrannosaurus", source: "Large Node", how: "Till soil with hoe, break large rocks in Cavern/Cave of Memories, Black Market" },
+  { name: "Tyrannosaurus Torso", creature: "Tyrannosaurus", source: "Large Node", how: "Till soil with hoe, break large rocks in Cavern/Cave of Memories, Black Market" },
+  { name: "Tyrannosaurus Leg", creature: "Tyrannosaurus", source: "Large Node", how: "Till soil with hoe, break large rocks in Cavern/Cave of Memories, Black Market" },
+  { name: "Tyrannosaurus Tail", creature: "Tyrannosaurus", source: "Large Node", how: "Till soil with hoe, break large rocks in Cavern/Cave of Memories, Black Market" },
+  { name: "Tyrannosaurus Prints", creature: "Tyrannosaurus", source: "Cave of Memories", how: "Cave of Memories quest (Dino Prints)" },
+  // Gallimimus (Mysterious / Medium node)
+  { name: "Gallimimus Skull", creature: "Gallimimus", source: "Mysterious/Medium Node", how: "Till soil/sand with hoe, break rocks (not farm/cavern for medium), Cave of Memories, Black Market" },
+  { name: "Gallimimus Spine", creature: "Gallimimus", source: "Mysterious/Medium Node", how: "Till soil/sand with hoe, break rocks (not farm/cavern for medium), Cave of Memories, Black Market" },
+  { name: "Gallimimus Torso", creature: "Gallimimus", source: "Mysterious/Medium Node", how: "Till soil/sand with hoe, break rocks (not farm/cavern for medium), Cave of Memories, Black Market" },
+  { name: "Gallimimus Leg", creature: "Gallimimus", source: "Mysterious/Medium Node", how: "Till soil/sand with hoe, break rocks (not farm/cavern for medium), Cave of Memories, Black Market" },
+  { name: "Gallimimus Tail", creature: "Gallimimus", source: "Mysterious/Medium Node", how: "Till soil/sand with hoe, break rocks (not farm/cavern for medium), Cave of Memories, Black Market" },
+  { name: "Gallimimus Prints", creature: "Gallimimus", source: "Cave of Memories", how: "Cave of Memories quest (Dino Prints)" },
+  // Stegosaurus (Medium node)
+  { name: "Stegosaurus Skull", creature: "Stegosaurus", source: "Medium Node", how: "Till soil, break medium/large rocks on main map (not farm/cavern), Cave of Memories, Black Market" },
+  { name: "Stegosaurus Spine", creature: "Stegosaurus", source: "Medium Node", how: "Till soil, break medium/large rocks on main map (not farm/cavern), Cave of Memories, Black Market" },
+  { name: "Stegosaurus Torso", creature: "Stegosaurus", source: "Medium Node", how: "Till soil, break medium/large rocks on main map (not farm/cavern), Cave of Memories, Black Market" },
+  { name: "Stegosaurus Leg", creature: "Stegosaurus", source: "Medium Node", how: "Till soil, break medium/large rocks on main map (not farm/cavern), Cave of Memories, Black Market" },
+  { name: "Stegosaurus Tail", creature: "Stegosaurus", source: "Medium Node", how: "Till soil, break medium/large rocks on main map (not farm/cavern), Cave of Memories, Black Market" },
+  { name: "Stegosaurus Prints", creature: "Stegosaurus", source: "Cave of Memories", how: "Cave of Memories quest (Dino Prints)" },
+  // Triceratops (Medium / Mysterious node)
+  { name: "Triceratops Skull", creature: "Triceratops", source: "Medium/Mysterious Node", how: "Till soil, break rocks on main map, Cave of Memories, Black Market" },
+  { name: "Triceratops Spine", creature: "Triceratops", source: "Medium/Mysterious Node", how: "Till soil, break rocks on main map, Cave of Memories, Black Market" },
+  { name: "Triceratops Torso", creature: "Triceratops", source: "Medium/Mysterious Node", how: "Till soil, break rocks on main map, Cave of Memories, Black Market" },
+  { name: "Triceratops Leg", creature: "Triceratops", source: "Medium/Mysterious Node", how: "Till soil, break rocks on main map, Cave of Memories, Black Market" },
+  { name: "Triceratops Tail", creature: "Triceratops", source: "Medium/Mysterious Node", how: "Till soil, break rocks on main map, Cave of Memories, Black Market" },
+  { name: "Triceratops Prints", creature: "Triceratops", source: "Cave of Memories", how: "Cave of Memories quest (Dino Prints)" },
+  // Mammoth (Mysterious node)
+  { name: "Mammoth Skull", creature: "Mammoth", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Mammoth Spine", creature: "Mammoth", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Mammoth Torso", creature: "Mammoth", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Mammoth Leg", creature: "Mammoth", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Mammoth Tusk", creature: "Mammoth", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Mammoth Prints", creature: "Mammoth", source: "Cave of Memories", how: "Cave of Memories quest (Dino Prints)" },
+  // Pterodactyl (Mysterious node)
+  { name: "Pterodactyl Skull", creature: "Pterodactyl", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Pterodactyl Spine", creature: "Pterodactyl", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Pterodactyl Wing", creature: "Pterodactyl", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Pterodactyl Leg", creature: "Pterodactyl", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Pterodactyl Tail", creature: "Pterodactyl", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  // Mosasaurus (Water node)
+  { name: "Mosasaurus Skull", creature: "Mosasaurus", source: "Water Node", how: "Till soil at Beach, clear trash/break sandstone while diving, Cave of Memories, Black Market" },
+  { name: "Mosasaurus Spine", creature: "Mosasaurus", source: "Water Node", how: "Till soil at Beach, clear trash/break sandstone while diving, Cave of Memories, Black Market" },
+  { name: "Mosasaurus Torso", creature: "Mosasaurus", source: "Water Node", how: "Till soil at Beach, clear trash/break sandstone while diving, Cave of Memories, Black Market" },
+  { name: "Mosasaurus Flipper", creature: "Mosasaurus", source: "Water Node", how: "Till soil at Beach, clear trash/break sandstone while diving, Cave of Memories, Black Market" },
+  { name: "Mosasaurus Tail", creature: "Mosasaurus", source: "Water Node", how: "Till soil at Beach, clear trash/break sandstone while diving, Cave of Memories, Black Market" },
+  { name: "Mosasaurus Prints", creature: "Mosasaurus", source: "Cave of Memories", how: "Cave of Memories quest (Dino Prints)" },
+  // Plesiosaurus (Water node)
+  { name: "Plesiosaurus Skull", creature: "Plesiosaurus", source: "Water Node", how: "Till soil at Beach, clear trash/break sandstone while diving, Cave of Memories, Black Market" },
+  { name: "Plesiosaurus Spine", creature: "Plesiosaurus", source: "Water Node", how: "Till soil at Beach, clear trash/break sandstone while diving, Cave of Memories, Black Market" },
+  { name: "Plesiosaurus Torso", creature: "Plesiosaurus", source: "Water Node", how: "Till soil at Beach, clear trash/break sandstone while diving, Cave of Memories, Black Market" },
+  { name: "Plesiosaurus Flipper", creature: "Plesiosaurus", source: "Water Node", how: "Till soil at Beach, clear trash/break sandstone while diving, Cave of Memories, Black Market" },
+  { name: "Plesiosaurus Tail", creature: "Plesiosaurus", source: "Water Node", how: "Till soil at Beach, clear trash/break sandstone while diving, Cave of Memories, Black Market" },
+  { name: "Plesiosaurus Prints", creature: "Plesiosaurus", source: "Cave of Memories", how: "Cave of Memories quest (Dino Prints)" },
+  // Velociraptor (Mysterious node)
+  { name: "Velociraptor Skull", creature: "Velociraptor", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Velociraptor Spine", creature: "Velociraptor", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Velociraptor Torso", creature: "Velociraptor", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Velociraptor Arm", creature: "Velociraptor", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Velociraptor Tail", creature: "Velociraptor", source: "Mysterious Node", how: "Till sand with hoe, clear trash diving, break sandstone diving, Cave of Memories, Black Market" },
+  { name: "Velociraptor Prints", creature: "Velociraptor", source: "Cave of Memories", how: "Cave of Memories quest (Dino Prints)" },
+];
+
+const ARTIFACTS = [
+  // All come from Coffers — grouped by coffer type
+  { name: "Ancient Mask", source: "Coffer", how: "Farm soil/sand tilling, fishing, trash clearing; Black Market" },
+  { name: "Ancient Tablet", source: "Coffer", how: "Farm soil/sand tilling, fishing, trash clearing; Black Market" },
+  { name: "Ancient Vase", source: "Coffer", how: "Farm soil/sand tilling, fishing, trash clearing; Black Market" },
+  { name: "Ancient Coin", source: "Coffer", how: "Farm soil/sand tilling, fishing, trash clearing; Black Market" },
+  { name: "Ancient Bowl", source: "Coffer", how: "Farm soil/sand tilling, fishing, trash clearing; Black Market" },
+  { name: "Ancient Figurine", source: "Coffer", how: "Farm soil/sand tilling, fishing, trash clearing; Black Market" },
+  { name: "Ancient Pendant", source: "Coffer", how: "Farm soil/sand tilling, fishing, trash clearing; Black Market" },
+  { name: "Ancient Ring", source: "Coffer", how: "Farm soil/sand tilling, fishing, trash clearing; Black Market" },
+  { name: "Ancient Earring", source: "Coffer", how: "Farm soil/sand tilling, fishing, trash clearing; Black Market" },
+  { name: "Antique Bottle", source: "Coffer / Ornate Coffer", how: "Farm tilling or Beach sand tilling; Black Market" },
+  { name: "Antique Sword", source: "Ornate Coffer", how: "Ocean 10–20m depth or Beach sand tilling; Black Market" },
+  { name: "Antique Compass", source: "Ornate Coffer", how: "Ocean 10–20m depth or Beach sand tilling; Black Market" },
+  { name: "Antique Lantern", source: "Ornate Coffer", how: "Ocean 10–20m depth or Beach sand tilling; Black Market" },
+  { name: "Antique Mirror", source: "Ornate Coffer", how: "Ocean 10–20m depth or Beach sand tilling; Black Market" },
+  { name: "Antique Pocket Watch", source: "Ornate Coffer", how: "Ocean 10–20m depth or Beach sand tilling; Black Market" },
+  { name: "Antique Music Box", source: "Ornate Coffer", how: "Ocean 10–20m depth or Beach sand tilling; Black Market" },
+  { name: "Antique Spyglass", source: "Ornate Coffer", how: "Ocean 10–20m depth or Beach sand tilling; Black Market" },
+  { name: "Antique Anchor", source: "Ornate Coffer", how: "Ocean 10–20m depth or Beach sand tilling; Black Market" },
+  { name: "Antique Sextant", source: "Ornate Coffer", how: "Ocean 10–20m depth or Beach sand tilling; Black Market" },
+  { name: "Mysterious Idol", source: "Mysterious Coffer", how: "Ocean 10–60m depth; Black Market" },
+  { name: "Mysterious Figurine", source: "Mysterious Coffer", how: "Ocean 10–60m depth; Black Market" },
+  { name: "Mysterious Orb", source: "Mysterious Coffer", how: "Ocean 10–60m depth; Black Market" },
+  { name: "Mysterious Tome", source: "Mysterious Coffer", how: "Ocean 10–60m depth; Black Market" },
+  { name: "Mysterious Amulet", source: "Mysterious Coffer", how: "Ocean 10–60m depth; Black Market" },
+  { name: "Mysterious Lens", source: "Mysterious Coffer", how: "Ocean 10–60m depth; Black Market" },
+  { name: "Mysterious Seal", source: "Mysterious Coffer", how: "Ocean 10–60m depth; Black Market" },
+  { name: "Shimmering Statuette", source: "Shimmering Coffer", how: "Ocean 20–50m depth; Black Market" },
+  { name: "Shimmering Crown", source: "Shimmering Coffer", how: "Ocean 20–50m depth; Black Market" },
+  { name: "Shimmering Bracelet", source: "Shimmering Coffer", how: "Ocean 20–50m depth; Black Market" },
+  { name: "Shimmering Necklace", source: "Shimmering Coffer", how: "Ocean 20–50m depth; Black Market" },
+  { name: "Shimmering Scepter", source: "Shimmering Coffer", how: "Ocean 20–50m depth; Black Market" },
+  { name: "Shimmering Brooch", source: "Shimmering Coffer", how: "Ocean 20–50m depth; Black Market" },
+  { name: "Marble Relic", source: "Marble Coffer", how: "Ocean 40–50m depth; Black Market" },
+  { name: "Marble Bust", source: "Marble Coffer", how: "Ocean 40–50m depth; Black Market" },
+  { name: "Marble Tablet", source: "Marble Coffer", how: "Ocean 40–50m depth; Black Market" },
+  { name: "Marble Urn", source: "Marble Coffer", how: "Ocean 40–50m depth; Black Market" },
+  { name: "Marble Chalice", source: "Marble Coffer", how: "Ocean 40–50m depth; Black Market" },
+  { name: "Pirate Treasure Map", source: "Pirate Coffer", how: "Ocean 50–60m depth; Black Market" },
+  { name: "Pirate Cutlass", source: "Pirate Coffer", how: "Ocean 50–60m depth; Black Market" },
+  { name: "Pirate Compass", source: "Pirate Coffer", how: "Ocean 50–60m depth; Black Market" },
+  { name: "Pirate Spyglass", source: "Pirate Coffer", how: "Ocean 50–60m depth; Black Market" },
+  { name: "Pirate Hook", source: "Pirate Coffer", how: "Ocean 50–60m depth; Black Market" },
+  { name: "Pirate Tricorn Hat", source: "Pirate Coffer", how: "Ocean 50–60m depth; Black Market" },
+  { name: "Torn Page (1)", source: "Soft Bristle Brush", how: "⚠️ Requires Soft Bristle Brush (unlock at 50 donations). Till soil/sand or break rocks after brush obtained." },
+  { name: "Torn Page (2)", source: "Soft Bristle Brush", how: "⚠️ Requires Soft Bristle Brush. Till soil/sand or break rocks." },
+  { name: "Torn Page (3)", source: "Soft Bristle Brush", how: "⚠️ Requires Soft Bristle Brush. Till soil/sand or break rocks." },
+  { name: "Torn Page (4)", source: "Soft Bristle Brush", how: "⚠️ Requires Soft Bristle Brush. Till soil/sand or break rocks." },
+  { name: "Torn Page (5)", source: "Soft Bristle Brush", how: "⚠️ Requires Soft Bristle Brush. Till soil/sand or break rocks." },
+];
+
+const INSECTS = [
+  { name: "Polyphemus Moth", rarity: "Common", time: "Night", weather: "Rain/Storm/Windy", season: "Spring/Summer", location: "Beach, Town, Lookout" },
+  { name: "Ghost Mantis", rarity: "Rare", time: "All Day", weather: "Any", season: "Spring/Summer/Fall", location: "Garden Lane, Forest (Mid)" },
+  { name: "Tiger Beetle", rarity: "Rare", time: "Day", weather: "Any", season: "Spring", location: "Garden Lane, Beach, Lake, Woodlands, Lookout, Town" },
+  { name: "Harpalus Beetle", rarity: "Uncommon", time: "Day", weather: "Any", season: "Spring/Fall", location: "Town, Lookout, Forest (Farm), Vineyard, Hot Spring" },
+  { name: "Firefly", rarity: "Uncommon", time: "Night", weather: "Sunny", season: "Spring/Summer", location: "Garden Lane, Lake, Woodlands, Forest (Farm/Lower/Higher), Deep Forest" },
+  { name: "Pipevine Swallowtail Butterfly", rarity: "Uncommon", time: "Day", weather: "Any", season: "All Seasons", location: "Garden Lane, Lake, Woodlands, Forest (Farm/Lower), Deep Forest" },
+  { name: "Little Wood Satyr Butterfly", rarity: "Common", time: "Day", weather: "Any", season: "Spring/Summer", location: "Garden Lane, Lake, Woodlands" },
+  { name: "Wolf Spider", rarity: "Super Rare", time: "Night", weather: "Any", season: "Summer", location: "Forest (Lower/Mid), Vineyard, Hot Spring" },
+  { name: "Yucca Moth", rarity: "Rare", time: "Day", weather: "Any", season: "Spring/Summer", location: "Beach, Town, Hot Spring" },
+  { name: "Puss Moth", rarity: "Uncommon", time: "All Day", weather: "Any", season: "Spring/Summer", location: "Lake, Forest (Higher), Vineyard, Hot Spring" },
+  { name: "Lady Beetle", rarity: "Common", time: "Day", weather: "Sunny/Windy", season: "Spring/Summer/Fall", location: "Garden Lane, Town, Lookout, Hot Spring" },
+  { name: "Violin Beetle", rarity: "Uncommon", time: "Day", weather: "Any", season: "Spring/Summer/Fall", location: "Forest (Higher/Mid), Woodlands, Deep Forest" },
+  { name: "Crowned Hairstreak Butterfly", rarity: "Legendary", time: "Day", weather: "Sunny", season: "Spring/Summer", location: "Vineyard, Lookout" },
+  { name: "Hercules Beetle", rarity: "Legendary", time: "Night", weather: "Any", season: "Summer", location: "Forest (Higher/Mid), Deep Forest" },
+  { name: "Emerald Cicada", rarity: "Rare", time: "Day", weather: "Sunny/Windy", season: "Summer", location: "Town, Woodlands, Garden Lane" },
+  { name: "Common Cicada", rarity: "Common", time: "Day", weather: "Sunny/Windy", season: "Summer/Fall", location: "Town, Woodlands, Garden Lane, Lookout" },
+  { name: "Banded Dragonfly", rarity: "Uncommon", time: "Day", weather: "Sunny", season: "Summer", location: "Lake, Beach, Garden Lane" },
+  { name: "Blue Darner Dragonfly", rarity: "Rare", time: "Day", weather: "Sunny", season: "Summer", location: "Lake" },
+  { name: "Golden Stag Beetle", rarity: "Super Rare", time: "Night", weather: "Any", season: "Summer", location: "Forest (Higher/Mid), Deep Forest" },
+  { name: "Katydid", rarity: "Common", time: "Night", weather: "Any", season: "Summer/Fall", location: "Garden Lane, Woodlands, Lake" },
+  { name: "Monarch Butterfly", rarity: "Rare", time: "Day", weather: "Sunny/Windy", season: "Summer/Fall", location: "Garden Lane, Lake, Lookout" },
+  { name: "Praying Mantis", rarity: "Uncommon", time: "Day", weather: "Any", season: "Summer/Fall", location: "Forest (Farm/Higher), Garden Lane" },
+  { name: "Rhinoceros Beetle", rarity: "Super Rare", time: "Night", weather: "Any", season: "Summer/Fall", location: "Forest (Higher/Mid), Deep Forest" },
+  { name: "Scarab Beetle", rarity: "Rare", time: "Day", weather: "Sunny", season: "Summer/Fall", location: "Beach, Town" },
+  { name: "Walking Stick", rarity: "Uncommon", time: "Day", weather: "Any", season: "Summer/Fall", location: "Forest (Lower/Mid), Garden Lane" },
+  { name: "Christmas Beetle", rarity: "Common", time: "Day", weather: "Any", season: "Fall", location: "Garden Lane, Woodlands, Town" },
+  { name: "Common Grasshopper", rarity: "Common", time: "Day", weather: "Any", season: "Spring/Summer/Fall", location: "Garden Lane, Beach, Lookout, Town" },
+  { name: "Darkling Beetle", rarity: "Common", time: "All Day", weather: "Any", season: "Fall/Winter", location: "Forest (Farm/Lower/Higher), Woodlands" },
+  { name: "Dung Beetle", rarity: "Uncommon", time: "Day", weather: "Any", season: "Fall/Winter", location: "Forest (Farm/Lower), Garden Lane" },
+  { name: "Fall Oak Moth", rarity: "Uncommon", time: "Night", weather: "Any", season: "Fall", location: "Forest (Farm/Higher/Mid), Deep Forest" },
+  { name: "Giant Water Bug", rarity: "Super Rare", time: "Night", weather: "Rain/Storm", season: "Fall", location: "Lake" },
+  { name: "Green Lacewing", rarity: "Common", time: "Night", weather: "Any", season: "Spring/Fall", location: "Garden Lane, Woodlands, Town" },
+  { name: "Leaf Insect", rarity: "Super Rare", time: "Day", weather: "Any", season: "Spring/Fall", location: "Forest (Mid), Deep Forest" },
+  { name: "Longhorn Beetle", rarity: "Uncommon", time: "Day", weather: "Any", season: "Spring/Summer/Fall", location: "Forest (Farm/Lower/Higher), Woodlands" },
+  { name: "Bark Mantis", rarity: "Rare", time: "Night", weather: "Any", season: "Fall", location: "Forest (Lower/Mid), Deep Forest" },
+  { name: "Black Cricket", rarity: "Common", time: "Night", weather: "Any", season: "Fall/Winter", location: "Garden Lane, Beach, Woodlands, Town" },
+  { name: "Blue Bottle Fly", rarity: "Common", time: "Day", weather: "Any", season: "All Seasons", location: "Dump (Recycling Center)" },
+  { name: "Blow Fly", rarity: "Common", time: "Day", weather: "Any", season: "All Seasons", location: "Dump (Recycling Center)" },
+  { name: "Common Housefly", rarity: "Common", time: "Day", weather: "Any", season: "All Seasons", location: "Dump (Recycling Center)" },
+  { name: "Giant Weta", rarity: "Legendary", time: "Night", weather: "Any", season: "Winter", location: "Forest (Higher/Mid), Deep Forest" },
+  { name: "Ice Moth", rarity: "Uncommon", time: "Night", weather: "Any", season: "Winter", location: "Forest (Farm/Lower), Garden Lane" },
+  { name: "Snow Flea", rarity: "Common", time: "Day", weather: "Any", season: "Winter", location: "Town, Woodlands, Lookout" },
+  { name: "Winter Moth", rarity: "Common", time: "Night", weather: "Any", season: "Winter", location: "Garden Lane, Lake, Woodlands" },
+  { name: "Woolly Bear Caterpillar", rarity: "Uncommon", time: "Day", weather: "Any", season: "Fall/Winter", location: "Garden Lane, Woodlands, Forest (Farm)" },
+  { name: "Luna Moth", rarity: "Super Rare", time: "Night", weather: "Sunny", season: "Spring", location: "Garden Lane, Forest (Farm/Lower), Deep Forest" },
+  { name: "Stag Beetle", rarity: "Super Rare", time: "Night", weather: "Any", season: "Spring/Summer", location: "Forest (Higher/Mid), Deep Forest" },
+  { name: "Stick Insect", rarity: "Rare", time: "Day", weather: "Any", season: "Spring/Summer", location: "Forest (Lower/Mid), Garden Lane" },
+  { name: "Assassin Bug", rarity: "Uncommon", time: "Day", weather: "Any", season: "Spring/Summer", location: "Forest (Lower), Garden Lane, Lake" },
+  { name: "Atlas Moth", rarity: "Legendary", time: "Night", weather: "Any", season: "Summer/Fall", location: "Forest (Higher/Mid), Vineyard, Deep Forest" },
+  { name: "Bombardier Beetle", rarity: "Rare", time: "Day", weather: "Any", season: "Spring/Summer", location: "Forest (Lower/Mid), Beach" },
+  { name: "Cockroach", rarity: "Common", time: "Night", weather: "Any", season: "All Seasons", location: "Dump, Town" },
+  { name: "Dragonfly", rarity: "Common", time: "Day", weather: "Sunny", season: "Spring/Summer", location: "Lake, Beach" },
+  { name: "Earthworm", rarity: "Common", time: "Day", weather: "Rain/Storm", season: "All Seasons", location: "Garden Lane, Forest (Farm)" },
+];
+
+const GEMS = [
+  // Wind Gate
+  { name: "Topaz", type: "Wind", source: "Wind Gate (mine)", how: "Wind Gate — opens after Water Gate level 40" },
+  { name: "Citrine", type: "Wind", source: "Wind Gate (mine)", how: "Wind Gate" },
+  { name: "Aquamarine", type: "Wind", source: "Wind Gate (mine)", how: "Wind Gate" },
+  { name: "Turquoise", type: "Wind", source: "Wind Gate (mine)", how: "Wind Gate" },
+  { name: "Peridot", type: "Wind", source: "Wind Gate (mine)", how: "Wind Gate" },
+  { name: "Alexandrite", type: "Wind", source: "Wind Gate (mine)", how: "Wind Gate" },
+  { name: "Tanzanite", type: "Wind", source: "Wind Gate (mine)", how: "Wind Gate" },
+  { name: "Labradorite", type: "Wind", source: "Wind Gate (mine)", how: "Wind Gate" },
+  // Water Gate
+  { name: "Sapphire", type: "Water", source: "Water Gate (ocean)", how: "Water Gate — dive 10m+ into the ocean" },
+  { name: "Lapis Lazuli", type: "Water", source: "Water Gate (ocean)", how: "Water Gate" },
+  { name: "Moonstone", type: "Water", source: "Water Gate (ocean)", how: "Water Gate" },
+  { name: "Opal", type: "Water", source: "Water Gate (ocean)", how: "Water Gate" },
+  { name: "Pearl", type: "Water", source: "Water Gate (ocean)", how: "Water Gate — also from oysters on ocean floor" },
+  { name: "Abalone Pearl", type: "Water", source: "Water Gate (ocean)", how: "Water Gate" },
+  { name: "Black Pearl", type: "Water", source: "Water Gate (ocean)", how: "Water Gate (deeper levels)" },
+  { name: "Coral Gem", type: "Water", source: "Water Gate (ocean)", how: "Water Gate" },
+  // Earth Gate / Cavern
+  { name: "Ruby", type: "Earth", source: "Cavern / Earth Gate", how: "Cavern (fire layers) or Earth Gate — red gem nodes" },
+  { name: "Garnet", type: "Earth", source: "Cavern / Earth Gate", how: "Cavern or Earth Gate" },
+  { name: "Carnelian", type: "Earth", source: "Cavern / Earth Gate", how: "Cavern or Earth Gate" },
+  { name: "Obsidian", type: "Earth", source: "Cavern / Earth Gate", how: "Cavern or Earth Gate" },
+  { name: "Jasper", type: "Earth", source: "Cavern / Earth Gate", how: "Cavern or Earth Gate" },
+  { name: "Onyx", type: "Earth", source: "Cavern / Earth Gate", how: "Cavern or Earth Gate" },
+  { name: "Tiger's Eye", type: "Earth", source: "Cavern / Earth Gate", how: "Cavern or Earth Gate" },
+  { name: "Bloodstone", type: "Earth", source: "Cavern / Earth Gate", how: "Cavern or Earth Gate" },
+  { name: "Sunstone", type: "Earth", source: "Cavern / Earth Gate", how: "Cavern or Earth Gate" },
+  { name: "Zircon", type: "Earth", source: "Cavern / Earth Gate", how: "Cavern or Earth Gate" },
+  // Fire Gate
+  { name: "Emerald", type: "Fire", source: "Fire Gate", how: "Fire Gate — requires Cavern + Earth Gate progression" },
+  { name: "Amethyst", type: "Fire", source: "Fire Gate", how: "Fire Gate" },
+  { name: "Diamond", type: "Fire", source: "Fire Gate", how: "Fire Gate (also Blacksmith for marriage ring)" },
+  { name: "Pink Diamond", type: "Fire", source: "Fire Gate", how: "Fire Gate (rarer tier; great universal gift)" },
+  { name: "Osmium Crystal", type: "Fire", source: "Fire Gate / Wind Gate", how: "Fire Gate or Wind Gate deeper levels" },
+  { name: "Spinel", type: "Fire", source: "Fire Gate", how: "Fire Gate" },
+  { name: "Tsavorite", type: "Fire", source: "Fire Gate", how: "Fire Gate" },
+  { name: "Paraiba Tourmaline", type: "Fire", source: "Fire Gate", how: "Fire Gate (rare)" },
+  { name: "Padparadscha Sapphire", type: "Fire", source: "Fire Gate", how: "Fire Gate (rare)" },
+];
+
+const WEATHER_COLORS = {
+  "Any": "#6b7280",
+  "Sunny": "#f59e0b",
+  "Sunny/Windy": "#f59e0b",
+  "Rainy": "#3b82f6",
+  "Rainy/Stormy": "#6366f1",
+  "Windy": "#10b981",
+};
+
+const SEASON_COLORS = {
+  "Any": "#9ca3af",
+  "Spring/Summer/Fall": "#84cc16",
+  "Spring/Summer": "#22c55e",
+  "Spring": "#86efac",
+  "Summer": "#fcd34d",
+  "Fall": "#fb923c",
+  "Winter": "#93c5fd",
+};
+
+function heartLabel(h) {
+  if (typeof h === "number") return `♥ ${h}`;
+  return `♥ ${h}`;
+}
+
+function weatherBadge(w) {
+  const color = WEATHER_COLORS[w] || "#9ca3af";
+  const icons = { "Sunny": "☀️", "Sunny/Windy": "☀️🌬️", "Rainy": "🌧️", "Rainy/Stormy": "⛈️", "Windy": "🌬️", "Any": "🌤️" };
+  return { icon: icons[w] || "🌤️", color };
+}
+
+const OFFERINGS_STORAGE_KEY = "ci_offerings_tracker_v1";
+
+const ALTARS = [
+  {
+    id: "crop",
+    name: "Crop Altar",
+    icon: "🌾",
+    color: "#86efac",
+    unlockNote: "First altar — unlocked after Mythical Dream quest. Completing 1 bundle opens the Catch Altar. Completing all unlocks the Greenhouse.",
+    reward: "Greenhouse unlocked",
+    bundles: [
+      {
+        id: "essential_resources",
+        name: "Essential Resources",
+        reward: "Recycling Machine",
+        items: [
+          { name: "Wood", qty: "×10", note: "Chop trees on your farm or around the island" },
+          { name: "Stone", qty: "×10", note: "Break rocks with pickaxe" },
+          { name: "Fiber", qty: "×10", note: "Cut grass with scythe" },
+          { name: "Sap", qty: "×10", note: "Chop trees; drops automatically" },
+          { name: "Maple Seeds", qty: "×5", note: "Chop maple trees (have leaf cap)" },
+          { name: "Oak Seeds", qty: "×5", note: "Chop oak trees" },
+          { name: "Pine Cones", qty: "×5", note: "Chop pine trees" },
+        ],
+        choiceNote: "All 7 items required (no choice)"
+      },
+      {
+        id: "spring_sesajen",
+        name: "Spring Sesajen",
+        reward: "Sugarcane Seeds",
+        items: [
+          { name: "Wasabi", qty: "", note: "Forage in spring or grow from seeds" },
+          { name: "Morel", qty: "", note: "Forage in forest during spring" },
+          { name: "Turnip", qty: "", note: "Grow from seeds — spring crop" },
+          { name: "Carrot", qty: "", note: "Grow from seeds — spring crop" },
+          { name: "Daisy", qty: "", note: "Forage in spring" },
+        ],
+        choiceNote: "Choose 5 of 5 (all required)"
+      },
+      {
+        id: "summer_sesajen",
+        name: "Summer Sesajen",
+        reward: "Tea Seeds",
+        items: [
+          { name: "Shallot", qty: "", note: "Summer crop" },
+          { name: "Hibiscus", qty: "", note: "Forage in summer" },
+          { name: "Blueberry", qty: "", note: "Summer crop" },
+          { name: "Hot Pepper", qty: "", note: "Summer crop" },
+          { name: "Sunflower (Bronze+)", qty: "", note: "⚠️ Must be bronze quality or higher" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "fall_sesajen",
+        name: "Fall Sesajen",
+        reward: "Barley Seeds",
+        items: [
+          { name: "Black Trumpet", qty: "", note: "Forage mushroom in fall" },
+          { name: "Fig", qty: "", note: "Fall crop" },
+          { name: "Orchid", qty: "", note: "Forage in fall" },
+          { name: "Pumpkin", qty: "", note: "Fall crop" },
+          { name: "Rice (Bronze+)", qty: "", note: "⚠️ Must be bronze quality or higher; fall crop" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "winter_sesajen",
+        name: "Winter Sesajen",
+        reward: "Crop Altar Complete Bonus",
+        items: [
+          { name: "Brussels Sprout", qty: "", note: "Winter crop" },
+          { name: "Kale", qty: "", note: "Winter crop" },
+          { name: "Rose Hip", qty: "", note: "Forage in winter" },
+          { name: "Snowdrop", qty: "", note: "Forage in winter" },
+          { name: "Tea Leaf (Bronze+)", qty: "", note: "⚠️ Must be bronze quality or higher; winter crop" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "ocean_loot",
+        name: "Ocean Loot",
+        reward: "Crop Altar Complete Bonus",
+        items: [
+          { name: "Sea Salt", qty: "×5", note: "Dive near ocean surface; forage on beach" },
+          { name: "Calico Scallop", qty: "", note: "Dive in ocean" },
+          { name: "Eastern Oyster", qty: "", note: "Dive in ocean" },
+          { name: "Blue Mussel", qty: "", note: "Dive in ocean" },
+          { name: "Purple Urchin", qty: "", note: "Dive in ocean" },
+        ],
+        choiceNote: "All 5 required"
+      },
+    ]
+  },
+  {
+    id: "catch",
+    name: "Catch Altar",
+    icon: "🎣",
+    color: "#7dd3fc",
+    unlockNote: "Unlocks after completing 1 Crop Altar bundle. Completing all 6 bundles unlocks the Dig Site + heals the forest sacred tree.",
+    reward: "Dig Site unlocked + Forest Sacred Tree healed + 40 Heritage points",
+    bundles: [
+      {
+        id: "freshwater_fish",
+        name: "Fresh Water Fish",
+        reward: "Fresh Water Fish bundle reward",
+        items: [
+          { name: "Catfish", qty: "", note: "Fish in river/lake — rainy weather" },
+          { name: "Tilapia", qty: "", note: "Fish in lake" },
+          { name: "Rainbow Fish", qty: "", note: "Fish in lake — sunny weather" },
+          { name: "Silver Arowana", qty: "", note: "Fish in lake" },
+          { name: "Koi (Silver+)", qty: "", note: "⚠️ Silver quality Koi — lake, rare" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "saltwater_fish",
+        name: "Sea Water Fish",
+        reward: "Sea Water bundle reward",
+        items: [
+          { name: "Pink Snapper", qty: "", note: "Fish in ocean" },
+          { name: "Lionfish", qty: "", note: "Fish in ocean" },
+          { name: "Asian Sheepshead", qty: "", note: "Fish in ocean" },
+          { name: "Yellowfin Tuna", qty: "", note: "Fish in ocean" },
+          { name: "Sardine (Silver+)", qty: "", note: "⚠️ Silver quality Sardine — ocean" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "rare_fish",
+        name: "Rare Fish",
+        reward: "Rare Fish bundle reward",
+        items: [
+          { name: "Sturgeon", qty: "", note: "Fish in lake — rare" },
+          { name: "Gator Gar", qty: "", note: "Fish in river/lake" },
+          { name: "Arapaima", qty: "", note: "Fish in lake — large" },
+          { name: "Giant Sea Bass", qty: "", note: "Fish in ocean — large, rare" },
+          { name: "Yellow Moray Eel", qty: "", note: "Fish in ocean" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "day_insect",
+        name: "Day Insects",
+        reward: "Day Insect bundle reward",
+        items: [
+          { name: "Pipevine Swallowtail Butterfly", qty: "", note: "Day, any weather, all seasons — Garden Lane/Forest/Lake" },
+          { name: "Tiger Beetle", qty: "", note: "Day, any weather, Spring only — Garden Lane/Beach/Town" },
+          { name: "Yucca Moth", qty: "", note: "Day, any weather, Spring/Summer — Beach/Town/Hot Spring" },
+          { name: "Assam Silk Moth", qty: "", note: "Day, any weather — Forest areas" },
+          { name: "Monarch Caterpillar", qty: "", note: "Day — Garden Lane/Lake area" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "night_insect",
+        name: "Night Insects",
+        reward: "Night Insect bundle reward",
+        items: [
+          { name: "Firefly", qty: "", note: "Night, sunny, Spring/Summer — Garden Lane/Forest/Lake" },
+          { name: "Cecropia Caterpillar", qty: "", note: "Night — Forest areas" },
+          { name: "Centipede", qty: "", note: "Night — various locations" },
+          { name: "Rove Beetle", qty: "", note: "Night — Forest/Garden Lane" },
+          { name: "Atlas Moth", qty: "", note: "Night, any weather, Summer/Fall — Forest/Vineyard (Legendary)" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "ocean_critters",
+        name: "Ocean Critters",
+        reward: "Ocean Critters bundle reward",
+        items: [
+          { name: "Cannonball Jellyfish", qty: "", note: "Dive in ocean — shallow to mid depth" },
+          { name: "Hermit Crab", qty: "", note: "Dive in ocean shallows" },
+          { name: "Sexy Shrimp", qty: "", note: "Dive in ocean" },
+          { name: "Sunflower Sea Star", qty: "", note: "Dive in ocean" },
+          { name: "Pom-Pom Crab", qty: "", note: "Dive in ocean" },
+        ],
+        choiceNote: "All 5 required"
+      },
+    ]
+  },
+  {
+    id: "advanced",
+    name: "Advanced Altar",
+    icon: "⚗️",
+    color: "#c4b5fd",
+    unlockNote: "Unlocks after completing 2 Catch Altar bundles. Completing all 6 unlocks Cave of Memories + heals the lake sacred tree.",
+    reward: "Cave of Memories unlocked + Lake Sacred Tree healed + 5 Warp Sesajen + recipe",
+    bundles: [
+      {
+        id: "barn_animals",
+        name: "Barn Animals",
+        reward: "Barn Animals bundle reward",
+        items: [
+          { name: "Milk", qty: "", note: "Cow — pet daily for best results" },
+          { name: "Goat Milk", qty: "", note: "Goat" },
+          { name: "Wool", qty: "", note: "Sheep" },
+          { name: "Large Goat Milk", qty: "", note: "Goat at max friendship" },
+          { name: "Large Wool", qty: "", note: "Sheep at max friendship" },
+          { name: "Large Milk (Silver+)", qty: "", note: "⚠️ Silver quality Large Milk — cow at max friendship" },
+        ],
+        choiceNote: "Choose 5 of 6"
+      },
+      {
+        id: "coop_animals",
+        name: "Coop Animals",
+        reward: "Coop Animals bundle reward",
+        items: [
+          { name: "Egg", qty: "", note: "Chicken" },
+          { name: "Duck Egg", qty: "", note: "Duck" },
+          { name: "Large Egg", qty: "", note: "Chicken at max friendship" },
+          { name: "Large Duck Egg", qty: "", note: "Duck at max friendship" },
+        ],
+        choiceNote: "All 4 required"
+      },
+      {
+        id: "basic_cooking",
+        name: "Basic Cooking",
+        reward: "Basic Cooking bundle reward",
+        items: [
+          { name: "Smoothie", qty: "", note: "Cook at kitchen — requires fruit" },
+          { name: "Grilled Fish", qty: "", note: "Cook at kitchen — fish + wood fire" },
+          { name: "Sunny Side Up Eggs", qty: "", note: "Cook at kitchen" },
+          { name: "Tomato Soup", qty: "", note: "Cook at kitchen — needs tomato" },
+          { name: "Onigiri", qty: "", note: "Cook at kitchen — needs rice" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "basic_artisan",
+        name: "Basic Artisan",
+        reward: "Basic Artisan bundle reward",
+        items: [
+          { name: "Mayonnaise", qty: "", note: "Egg in Mayonnaise Machine" },
+          { name: "Duck Mayonnaise", qty: "", note: "Duck Egg in Mayonnaise Machine" },
+          { name: "Cheese", qty: "", note: "Milk in Cheese Press" },
+          { name: "Goat Cheese", qty: "", note: "Goat Milk in Cheese Press" },
+          { name: "Pickled Radishes", qty: "", note: "Radish in Preserves Jar" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "fruit_plant",
+        name: "Fruit Plants",
+        reward: "Fruit Plants bundle reward",
+        items: [
+          { name: "Rambutan (Silver+)", qty: "", note: "⚠️ Tropical fruit tree" },
+          { name: "Durian (Silver+)", qty: "", note: "⚠️ Tropical fruit tree" },
+          { name: "Mango (Silver+)", qty: "", note: "⚠️ Tropical fruit tree" },
+          { name: "Dragonfruit (Silver+)", qty: "", note: "⚠️ Fruit tree" },
+          { name: "Apple (Silver+)", qty: "", note: "⚠️ Fruit tree — fall" },
+          { name: "Lemon (Silver+)", qty: "", note: "⚠️ Citrus tree" },
+          { name: "Almond (Silver+)", qty: "", note: "⚠️ Nut tree" },
+          { name: "Cocoa Bean (Silver+)", qty: "", note: "⚠️ Tropical tree" },
+        ],
+        choiceNote: "Choose 5 of 8"
+      },
+      {
+        id: "monster_loot",
+        name: "Monster Loot",
+        reward: "Monster Loot bundle reward",
+        items: [
+          { name: "Spider Fur", qty: "", note: "Kill spiders in the Cavern" },
+          { name: "Monster Essence", qty: "", note: "Kill monsters in the Cavern" },
+          { name: "Bat Wing", qty: "", note: "Kill bats in the Cavern" },
+          { name: "Tough Meat", qty: "", note: "Kill stronger monsters in deeper Cavern" },
+          { name: "Slime Gloop", qty: "", note: "Kill slimes in the Cavern" },
+        ],
+        choiceNote: "All 5 required"
+      },
+    ]
+  },
+  {
+    id: "rare",
+    name: "Rare Altar",
+    icon: "💠",
+    color: "#f9a8d4",
+    unlockNote: "Unlocks after completing 3 bundles across any altar. Completing all 6 unlocks Savannah + heals the farm sacred tree + 1 Mythical Pet Seed.",
+    reward: "Savannah unlocked + Farm Sacred Tree healed + Mythical Pet Seed (Sawee!) + 40 Heritage points",
+    bundles: [
+      {
+        id: "rare_crops",
+        name: "Rare Crops",
+        reward: "Sprinkler III",
+        items: [
+          { name: "Sugarcane (Gold+)", qty: "", note: "⚠️ Gold quality — summer crop" },
+          { name: "Snake Fruit (Gold+)", qty: "", note: "⚠️ Gold quality — tropical crop" },
+          { name: "Coffee Bean (Gold+)", qty: "", note: "⚠️ Gold quality — spring/summer crop" },
+          { name: "Taro Root (Gold+)", qty: "", note: "⚠️ Gold quality — fall crop" },
+          { name: "Cactus (Gold+)", qty: "", note: "⚠️ Gold quality — desert crop or greenhouse" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "precious_gems",
+        name: "Precious Gems",
+        reward: "Slime of Replication",
+        items: [
+          { name: "Black Opal", qty: "", note: "Water Gate (diving)" },
+          { name: "Labradorite", qty: "", note: "Wind Gate (mine)" },
+          { name: "Diamond", qty: "", note: "Fire Gate (deep mine) — also sold at Blacksmith" },
+          { name: "Peridot", qty: "", note: "Wind Gate" },
+          { name: "Red Beryl", qty: "", note: "Fire Gate (rare drop)" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "rare_cooking",
+        name: "Rare Cooking",
+        reward: "Jamu Recipe",
+        items: [
+          { name: "Vegan Taco", qty: "", note: "Cook at kitchen — needs house level 2+" },
+          { name: "Apple Pie", qty: "", note: "Cook at kitchen — needs apple + flour" },
+          { name: "Serabi", qty: "", note: "Cook at kitchen — Indonesian pancake" },
+          { name: "Pad Thai", qty: "", note: "Cook at kitchen — needs noodles" },
+          { name: "Es Cendol", qty: "", note: "Cook at kitchen — coconut dessert" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "rare_artisan",
+        name: "Rare Artisan",
+        reward: "Aging Barrel",
+        items: [
+          { name: "Titan Arum Black Honey", qty: "", note: "Bee House near Titan Arum flower" },
+          { name: "Kombucha", qty: "", note: "Keg — ferment tea" },
+          { name: "Apple Wine", qty: "", note: "Keg — ferment apple" },
+          { name: "Fermented Goat Cheese Wheel", qty: "", note: "Aging Barrel — age goat cheese" },
+          { name: "White Truffle Oil", qty: "", note: "Oil Press — white truffle" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "rare_ranching",
+        name: "Rare Ranching Products",
+        reward: "Auto Petter",
+        items: [
+          { name: "Black Truffle", qty: "", note: "Pig product — pet daily, requires pig" },
+          { name: "Large Quail Egg", qty: "", note: "Quail at max friendship" },
+          { name: "Large Llama Wool", qty: "", note: "Llama at max friendship" },
+          { name: "Large Feather", qty: "", note: "Ostrich at max friendship" },
+          { name: "Large Gesha Coffee Bean", qty: "", note: "Goat at high friendship — rare drop" },
+        ],
+        choiceNote: "All 5 required"
+      },
+      {
+        id: "rare_resources",
+        name: "Rare Resources",
+        reward: "Rare Altar Complete (Mythical Pet Seed!)",
+        items: [
+          { name: "Gold Bar", qty: "×3", note: "Smelt 5 Gold Ore in furnace each" },
+          { name: "Osmium Bar", qty: "×3", note: "Smelt 5 Osmium Ore in furnace each — very deep Cavern" },
+          { name: "Gold Kelp Essence", qty: "×3", note: "Process Gold Kelp at Kelp Processor" },
+          { name: "Osmium Kelp Essence", qty: "×3", note: "Process Osmium Kelp at Kelp Processor — deepest ocean" },
+          { name: "Hardwood", qty: "×10", note: "Chop large stumps with Copper Axe+" },
+          { name: "Battery", qty: "×3", note: "Lightning Rod during storm, or purchase" },
+        ],
+        choiceNote: "Choose 5 of 6"
+      },
+    ]
+  },
+  {
+    id: "guardian",
+    name: "Guardian Altar",
+    icon: "🌀",
+    color: "#fbbf24",
+    unlockNote: "Unlocks after: Town Rank A + Attractions unlocked + visiting the Goddess. Find the 4 Guardians (Master Slime, King Tan, Pandazen, Lady Lavanna) and bring their requested items. Completing all offerings completes the Guardian Mural.",
+    reward: "Guardian Mural complete + Goddess Outfit + 55 Heritage points",
+    bundles: [
+      {
+        id: "master_slime",
+        name: "Master Slime",
+        reward: "Guardian Mural piece",
+        items: [
+          { name: "4 Fossils (any type)", qty: "×4", note: "Any fossil from any node — process at Laboratory" },
+          { name: "Location", qty: "", note: "📍 Temple in the upper forest north of the Ranch — look for 3 bowls" },
+        ],
+        choiceNote: "Bring 4 fossils of any type/quality"
+      },
+      {
+        id: "king_tan",
+        name: "King Tan",
+        reward: "Guardian Mural piece",
+        items: [
+          { name: "See King Tan in Deep Forest", qty: "", note: "📍 Northwest side of Deep Forest — only interactable after Guardian Altar unlocks" },
+          { name: "Bring requested items", qty: "", note: "Items vary — check in-game riddle at Guardian Altar for specifics" },
+        ],
+        choiceNote: "Check riddle board at Lake Temple for exact items"
+      },
+      {
+        id: "pandazen",
+        name: "Pandazen",
+        reward: "Guardian Mural piece",
+        items: [
+          { name: "See Pandazen in Bamboo Forest", qty: "", note: "📍 Bamboo forest north of the Bath House — only interactable after Guardian Altar unlocks" },
+          { name: "Bring requested items", qty: "", note: "Items vary — check in-game riddle at Guardian Altar for specifics" },
+        ],
+        choiceNote: "Check riddle board at Lake Temple for exact items"
+      },
+      {
+        id: "lady_lavanna",
+        name: "Lady Lavanna",
+        reward: "Guardian Mural piece",
+        items: [
+          { name: "See Lady Lavanna in Savannah", qty: "", note: "📍 Savannah Ranch — requires Savannah unlocked (complete Rare Altar first!)" },
+          { name: "Bring requested items", qty: "", note: "Items vary — check in-game riddle at Guardian Altar for specifics" },
+        ],
+        choiceNote: "⚠️ Requires Rare Altar completed first to unlock Savannah"
+      },
+    ]
+  },
+];
+
+const RARITY_COLORS = {
+  "Common": "#9ca3af",
+  "Uncommon": "#34d399",
+  "Rare": "#60a5fa",
+  "Super Rare": "#a78bfa",
+  "Legendary": "#fbbf24",
+};
+
+const GEM_COLORS = {
+  "Wind": "#86efac",
+  "Water": "#7dd3fc",
+  "Earth": "#d97706",
+  "Fire": "#f87171",
+};
+
+function CheckRow({ label, sub, checked, onToggle, warn }) {
+  return (
+    <div onClick={onToggle} style={{
+      display: "flex", gap: 10, alignItems: "flex-start",
+      padding: "10px 12px", borderRadius: 8, marginBottom: 5, cursor: "pointer",
+      background: checked ? "rgba(251,191,36,0.07)" : "rgba(255,255,255,0.04)",
+      border: checked ? "1px solid rgba(251,191,36,0.25)" : "1px solid rgba(255,255,255,0.07)",
+      opacity: checked ? 0.65 : 1, transition: "all 0.15s",
+    }}>
+      <div style={{
+        width: 20, height: 20, borderRadius: 5, flexShrink: 0, marginTop: 1,
+        border: checked ? "2px solid #fbbf24" : "2px solid #475569",
+        background: checked ? "#fbbf24" : "transparent",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        fontSize: 12, color: "#1a1a1a", fontWeight: "bold"
+      }}>{checked && "✓"}</div>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 13, color: checked ? "#9ca3af" : "#e8dcc8", fontWeight: "500" }}>{label}</div>
+        {sub && <div style={{ fontSize: 11, color: warn ? "#fcd34d" : "#64748b", marginTop: 2, fontStyle: "italic" }}>{sub}</div>}
+      </div>
+    </div>
+  );
+}
+
+export default function CoralIslandTracker() {
+  const [activeTab, setActiveTab] = useState("scenes");
+  const [completed, setCompleted] = useState({});
+  const [museumDone, setMuseumDone] = useState({});
+  const [offeringsDone, setOfferingsDone] = useState({});
+  // scenes tab state
+  const [search, setSearch] = useState("");
+  const [filterCat, setFilterCat] = useState("All");
+  const [filterRomance, setFilterRomance] = useState("All");
+  const [selectedChar, setSelectedChar] = useState(null);
+  // museum tab state
+  const [museumTab, setMuseumTab] = useState("overview");
+  const [museumSearch, setMuseumSearch] = useState("");
+
+  useEffect(() => {
+    try {
+      const s = localStorage.getItem(STORAGE_KEY);
+      if (s) setCompleted(JSON.parse(s));
+      const m = localStorage.getItem(MUSEUM_STORAGE_KEY);
+      if (m) setMuseumDone(JSON.parse(m));
+      const o = localStorage.getItem(OFFERINGS_STORAGE_KEY);
+      if (o) setOfferingsDone(JSON.parse(o));
+    } catch {}
+  }, []);
+
+  function saveScenes(next) {
+    setCompleted(next);
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch {}
+  }
+  function saveMuseum(next) {
+    setMuseumDone(next);
+    try { localStorage.setItem(MUSEUM_STORAGE_KEY, JSON.stringify(next)); } catch {}
+  }
+  function saveOfferings(next) {
+    setOfferingsDone(next);
+    try { localStorage.setItem(OFFERINGS_STORAGE_KEY, JSON.stringify(next)); } catch {}
+  }
+
+  function toggleEvent(charName, idx) {
+    const key = `${charName}__${idx}`;
+    saveScenes({ ...completed, [key]: !completed[key] });
+  }
+  function toggleMuseum(key) {
+    saveMuseum({ ...museumDone, [key]: !museumDone[key] });
+  }
+  function toggleOffering(key) {
+    saveOfferings({ ...offeringsDone, [key]: !offeringsDone[key] });
+  }
+  function oDone(key) { return !!offeringsDone[key]; }
+
+  function isComplete(charName, idx) { return !!completed[`${charName}__${idx}`]; }
+  function mDone(key) { return !!museumDone[key]; }
+
+  function charProgress(char) {
+    const done = char.events.filter((_, i) => isComplete(char.name, i)).length;
+    return { done, total: char.events.length };
+  }
+
+  const allCategories = ["All", "Townie", "Merfolk"];
+  const filtered = CHARACTERS.filter(c => {
+    if (filterCat !== "All" && c.category !== filterCat) return false;
+    if (filterRomance === "Romanceable" && !c.romanceable) return false;
+    if (filterRomance === "Friendship" && c.romanceable) return false;
+    if (search && !c.name.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  });
+
+  const totalEvents = CHARACTERS.reduce((a, c) => a + c.events.length, 0);
+  const doneEvents = CHARACTERS.reduce((a, c) => a + c.events.filter((_, i) => isComplete(c.name, i)).length, 0);
+  const pct = totalEvents ? Math.round((doneEvents / totalEvents) * 100) : 0;
+
+  // museum donation count
+  const totalMuseumItems = FOSSILS.length + ARTIFACTS.length + INSECTS.length + GEMS.length;
+  const doneMuseumItems = Object.keys(museumDone).filter(k => museumDone[k] && !k.startsWith("milestone__") && !k.startsWith("col__")).length;
+  const nextMilestone = MUSEUM_MILESTONES.find(m => doneMuseumItems < m.count);
+
+  const char = selectedChar ? CHARACTERS.find(c => c.name === selectedChar) : null;
+
+  const ms = museumSearch.toLowerCase();
+
+  const baseStyle = {
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)",
+    fontFamily: "'Georgia', 'Palatino Linotype', serif",
+    color: "#e8dcc8",
+  };
+
+  const tabBtn = (id, label) => (
+    <button onClick={() => setActiveTab(id)} style={{
+      padding: "9px 18px", border: "none", cursor: "pointer", fontSize: 14,
+      fontFamily: "inherit", fontWeight: activeTab === id ? "bold" : "normal",
+      background: "transparent",
+      color: activeTab === id ? "#ffd97d" : "#94a3b8",
+      borderBottom: activeTab === id ? "2px solid #ffd97d" : "2px solid transparent",
+      transition: "all 0.15s",
+    }}>{label}</button>
+  );
+
+  return (
+    <div style={baseStyle}>
+      {/* ── HEADER ── */}
+      <div style={{
+        background: "rgba(255,255,255,0.05)", backdropFilter: "blur(10px)",
+        borderBottom: "1px solid rgba(255,215,100,0.2)", padding: "18px 24px 0",
+      }}>
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 14 }}>
+            <div style={{ fontSize: 32 }}>🪸</div>
+            <div>
+              <h1 style={{ margin: 0, fontSize: 20, fontWeight: "bold", color: "#ffd97d", letterSpacing: 1 }}>
+                Coral Island Tracker
+              </h1>
+              <div style={{ fontSize: 11, color: "#94a3b8" }}>Heart Events · Museum & Offerings</div>
+            </div>
+            <div style={{ marginLeft: "auto", textAlign: "right" }}>
+              <div style={{ fontSize: 11, color: "#94a3b8" }}>Scenes: {doneEvents}/{totalEvents} · Museum items: {doneMuseumItems}/{totalMuseumItems}</div>
+            </div>
+          </div>
+          {/* Tab bar */}
+          <div style={{ display: "flex", gap: 0, borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+            {tabBtn("scenes", "🎭 Heart Events")}
+            {tabBtn("museum", "🏛️ Museum")}
+            {tabBtn("offerings", "🌸 Offerings")}
+          </div>
+        </div>
+      </div>
+
+      {/* ── SCENES TAB ── */}
+      {activeTab === "scenes" && (
+        <div style={{ maxWidth: 960, margin: "0 auto", padding: "16px 24px" }}>
+          {/* Progress bar */}
+          <div style={{ height: 5, background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden", marginBottom: 16 }}>
+            <div style={{ height: "100%", width: `${pct}%`, background: "linear-gradient(90deg,#f59e0b,#ec4899)", borderRadius: 999, transition: "width 0.5s" }} />
+          </div>
+
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 }}>
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search character..."
+              style={{ flex: "1 1 150px", padding: "7px 12px", borderRadius: 8, border: "1px solid rgba(255,215,100,0.3)", background: "rgba(255,255,255,0.07)", color: "#e8dcc8", fontSize: 13, outline: "none" }} />
+            {allCategories.map(cat => (
+              <button key={cat} onClick={() => setFilterCat(cat)} style={{
+                padding: "7px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontFamily: "inherit",
+                background: filterCat === cat ? "#f59e0b" : "rgba(255,255,255,0.08)",
+                color: filterCat === cat ? "#1a1a1a" : "#e8dcc8", fontWeight: filterCat === cat ? "bold" : "normal",
+              }}>{cat}</button>
+            ))}
+            {["All", "Romanceable", "Friendship"].map(f => (
+              <button key={f} onClick={() => setFilterRomance(f)} style={{
+                padding: "7px 12px", borderRadius: 8, border: "none", cursor: "pointer", fontSize: 12, fontFamily: "inherit",
+                background: filterRomance === f ? "#ec4899" : "rgba(255,255,255,0.08)",
+                color: filterRomance === f ? "#fff" : "#e8dcc8", fontWeight: filterRomance === f ? "bold" : "normal",
+              }}>{f === "All" ? "💖 All" : f === "Romanceable" ? "💍 Romance" : "🤝 Friendship"}</button>
+            ))}
+          </div>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(250px,1fr))", gap: 10 }}>
+            {filtered.map(c => {
+              const { done, total } = charProgress(c);
+              const allDone = done === total;
+              const pctC = total ? Math.round((done / total) * 100) : 0;
+              return (
+                <div key={c.name} onClick={() => setSelectedChar(c.name)} style={{
+                  background: allDone ? "linear-gradient(135deg,rgba(251,191,36,0.13),rgba(236,72,153,0.08))" : "rgba(255,255,255,0.05)",
+                  border: allDone ? "1px solid rgba(251,191,36,0.45)" : "1px solid rgba(255,255,255,0.09)",
+                  borderRadius: 11, padding: "13px 15px", cursor: "pointer", transition: "all 0.2s",
+                }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    <div>
+                      <div style={{ fontWeight: "bold", fontSize: 14, color: "#ffd97d" }}>{c.romanceable ? "💖" : "🤝"} {c.name}</div>
+                      <div style={{ fontSize: 11, color: "#64748b", marginTop: 1 }}>{c.category} · {total} events</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ fontSize: 16, fontWeight: "bold", color: allDone ? "#fbbf24" : "#e8dcc8" }}>{done}/{total}</div>
+                      {allDone && <div style={{ fontSize: 10, color: "#fbbf24" }}>✓ Done!</div>}
+                    </div>
+                  </div>
+                  <div style={{ marginTop: 9, height: 3, background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${pctC}%`, background: allDone ? "#fbbf24" : "linear-gradient(90deg,#3b82f6,#8b5cf6)", borderRadius: 999, transition: "width 0.4s" }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* ── MUSEUM TAB ── */}
+      {activeTab === "museum" && (
+        <div style={{ maxWidth: 960, margin: "0 auto", padding: "16px 24px" }}>
+          {/* Museum overview bar */}
+          <div style={{
+            background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,215,100,0.2)",
+            borderRadius: 12, padding: "14px 18px", marginBottom: 16,
+            display: "flex", gap: 20, flexWrap: "wrap", alignItems: "center"
+          }}>
+            <div>
+              <div style={{ fontSize: 22, fontWeight: "bold", color: "#ffd97d" }}>{doneMuseumItems}</div>
+              <div style={{ fontSize: 11, color: "#94a3b8" }}>items donated</div>
+            </div>
+            <div style={{ flex: 1, minWidth: 160 }}>
+              <div style={{ height: 5, background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden" }}>
+                <div style={{ height: "100%", width: `${Math.round((doneMuseumItems / totalMuseumItems) * 100)}%`, background: "linear-gradient(90deg,#22d3ee,#a78bfa)", borderRadius: 999, transition: "width 0.5s" }} />
+              </div>
+              <div style={{ fontSize: 11, color: "#64748b", marginTop: 4 }}>{doneMuseumItems}/{totalMuseumItems} total items tracked</div>
+            </div>
+            {nextMilestone && (
+              <div style={{ textAlign: "right" }}>
+                <div style={{ fontSize: 11, color: "#fcd34d" }}>Next milestone at {nextMilestone.count} donations:</div>
+                <div style={{ fontSize: 12, color: "#e8dcc8" }}>{nextMilestone.reward}</div>
+              </div>
+            )}
+          </div>
+
+          {/* Museum sub-tabs */}
+          <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
+            {[
+              { id: "overview", label: "📋 Overview" },
+              { id: "fossils", label: "🦕 Fossils" },
+              { id: "artifacts", label: "🏺 Artifacts" },
+              { id: "insects", label: "🦋 Insects" },
+              { id: "gems", label: "💎 Gems" },
+              { id: "milestones", label: "🎁 Milestones" },
+            ].map(({ id, label }) => (
+              <button key={id} onClick={() => setMuseumTab(id)} style={{
+                padding: "7px 13px", borderRadius: 8, border: "none", cursor: "pointer",
+                fontSize: 12, fontFamily: "inherit",
+                background: museumTab === id ? "#22d3ee" : "rgba(255,255,255,0.08)",
+                color: museumTab === id ? "#0f172a" : "#e8dcc8",
+                fontWeight: museumTab === id ? "bold" : "normal",
+              }}>{label}</button>
+            ))}
+            <input value={museumSearch} onChange={e => setMuseumSearch(e.target.value)} placeholder="Search items..."
+              style={{ marginLeft: "auto", padding: "7px 12px", borderRadius: 8, border: "1px solid rgba(34,211,238,0.3)", background: "rgba(255,255,255,0.06)", color: "#e8dcc8", fontSize: 12, outline: "none", minWidth: 140 }} />
+          </div>
+
+          {/* ── OVERVIEW ── */}
+          {museumTab === "overview" && (
+            <div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(230px,1fr))", gap: 10, marginBottom: 20 }}>
+                {MUSEUM_COLLECTIONS.map(col => {
+                  const donatedCount = Object.keys(museumDone).filter(k => k.startsWith(`col_item__${col.id}__`) && museumDone[k]).length;
+                  const colPct = Math.round((donatedCount / col.total) * 100);
+                  const colDone = mDone(`col__${col.id}`);
+                  return (
+                    <div key={col.id} style={{
+                      background: colDone ? "rgba(34,211,238,0.1)" : "rgba(255,255,255,0.05)",
+                      border: colDone ? "1px solid rgba(34,211,238,0.4)" : "1px solid rgba(255,255,255,0.09)",
+                      borderRadius: 11, padding: "13px 15px",
+                    }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                        <div style={{ fontSize: 22 }}>{col.icon}</div>
+                        <div style={{ textAlign: "right" }}>
+                          <div style={{ fontSize: 15, fontWeight: "bold", color: colDone ? "#22d3ee" : "#e8dcc8" }}>{donatedCount}/{col.total}</div>
+                        </div>
+                      </div>
+                      <div style={{ fontSize: 13, fontWeight: "bold", color: "#ffd97d", marginTop: 6 }}>{col.name}</div>
+                      <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>🎁 {col.reward}</div>
+                      <div style={{ marginTop: 8, height: 3, background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden" }}>
+                        <div style={{ height: "100%", width: `${colPct}%`, background: colDone ? "#22d3ee" : "linear-gradient(90deg,#a78bfa,#22d3ee)", borderRadius: 999, transition: "width 0.4s" }} />
+                      </div>
+                      <div onClick={() => toggleMuseum(`col__${col.id}`)} style={{
+                        marginTop: 8, fontSize: 11, cursor: "pointer", color: colDone ? "#22d3ee" : "#475569",
+                        textDecoration: "underline",
+                      }}>{colDone ? "✓ Collection complete!" : "Mark collection complete"}</div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 11, padding: "14px 16px" }}>
+                <div style={{ fontSize: 13, fontWeight: "bold", color: "#ffd97d", marginBottom: 10 }}>🦖 Dino Hologram Rewards</div>
+                <div style={{ fontSize: 11, color: "#fcd34d", marginBottom: 10, fontStyle: "italic" }}>
+                  ⚠️ Requires: All 60 fossils donated + Town Rank A. Find Dino Prints in Cave of Memories. Each hologram takes 2 days to install.
+                </div>
+                {["Brontosaurus","Gallimimus","Mammoth","Mosasaurus","Plesiosaurus","Pterodactyl","Stegosaurus","Triceratops","Tyrannosaurus","Velociraptor"].map(dino => (
+                  <CheckRow key={dino} label={`${dino} Hologram`} sub={`Rewards: ${dino} animal skin`} checked={mDone(`dino__${dino}`)} onToggle={() => toggleMuseum(`dino__${dino}`)} />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ── FOSSILS ── */}
+          {museumTab === "fossils" && (() => {
+            const creatures = [...new Set(FOSSILS.map(f => f.creature))];
+            return (
+              <div>
+                <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12 }}>
+                  🦴 <b>60 fossils total.</b> Obtain the Soft Bristle Brush (50 donations) to start finding fossil nodes. Process nodes at the Laboratory for 20g each.
+                </div>
+                {creatures.map(creature => {
+                  const parts = FOSSILS.filter(f => f.creature === creature && (!ms || f.name.toLowerCase().includes(ms)));
+                  if (!parts.length) return null;
+                  const doneParts = parts.filter(f => mDone(`fossil__${f.name}`)).length;
+                  return (
+                    <div key={creature} style={{ marginBottom: 14 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                        <div style={{ fontSize: 13, fontWeight: "bold", color: "#ffd97d" }}>🦴 {creature}</div>
+                        <div style={{ fontSize: 11, color: "#64748b" }}>{doneParts}/{parts.length}</div>
+                        <div style={{ flex: 1, height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden" }}>
+                          <div style={{ height: "100%", width: `${parts.length ? Math.round((doneParts/parts.length)*100) : 0}%`, background: "#a78bfa", borderRadius: 999 }} />
+                        </div>
+                      </div>
+                      {parts.map(f => (
+                        <CheckRow key={f.name} label={f.name} sub={`${f.source} · ${f.how}`} warn={f.how.includes("⚠️")}
+                          checked={mDone(`fossil__${f.name}`)} onToggle={() => toggleMuseum(`fossil__${f.name}`)} />
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+
+          {/* ── ARTIFACTS ── */}
+          {museumTab === "artifacts" && (() => {
+            const cofferTypes = [...new Set(ARTIFACTS.map(a => a.source))];
+            return (
+              <div>
+                <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12 }}>
+                  🏺 <b>78 artifacts total.</b> All come from Coffers. Coffers drop from: tilling soil/sand, fishing, trash clearing, and diving. Buy them at the Black Market too.
+                </div>
+                <div style={{ background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.2)", borderRadius: 8, padding: "10px 14px", marginBottom: 14, fontSize: 11, color: "#fcd34d" }}>
+                  🪣 Coffer types by depth: Regular (Farm/Beach) · Ornate (Ocean 10–20m) · Mysterious (Ocean 10–60m) · Shimmering (20–50m) · Marble (40–50m) · Pirate (50–60m)
+                </div>
+                {cofferTypes.map(src => {
+                  const items = ARTIFACTS.filter(a => a.source === src && (!ms || a.name.toLowerCase().includes(ms)));
+                  if (!items.length) return null;
+                  const doneCount = items.filter(a => mDone(`artifact__${a.name}`)).length;
+                  return (
+                    <div key={src} style={{ marginBottom: 14 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                        <div style={{ fontSize: 13, fontWeight: "bold", color: "#ffd97d" }}>📦 {src}</div>
+                        <div style={{ fontSize: 11, color: "#64748b" }}>{doneCount}/{items.length}</div>
+                        <div style={{ flex: 1, height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden" }}>
+                          <div style={{ height: "100%", width: `${Math.round((doneCount/items.length)*100)}%`, background: "#f59e0b", borderRadius: 999 }} />
+                        </div>
+                      </div>
+                      {items.map(a => (
+                        <CheckRow key={a.name} label={a.name} sub={a.how} warn={a.how.includes("⚠️")}
+                          checked={mDone(`artifact__${a.name}`)} onToggle={() => toggleMuseum(`artifact__${a.name}`)} />
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+
+          {/* ── INSECTS ── */}
+          {museumTab === "insects" && (() => {
+            const seasons = ["All Seasons", "Spring", "Spring/Summer", "Spring/Summer/Fall", "Summer", "Summer/Fall", "Fall", "Fall/Winter", "Winter", "Spring/Fall"];
+            const displayed = INSECTS.filter(i => !ms || i.name.toLowerCase().includes(ms));
+            const doneCount = displayed.filter(i => mDone(`insect__${i.name}`)).length;
+            return (
+              <div>
+                <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12 }}>
+                  🦋 <b>53 insects total.</b> Catch with the Bug Net (received Day 3 of Spring from Eleanor). Hold M1/left trigger to sneak. Use traps for AFK catching. Light Feet skill helps with rare bugs.
+                </div>
+                <div style={{ fontSize: 11, color: "#64748b", marginBottom: 14, fontStyle: "italic" }}>
+                  Day = 06:00–18:00 · Night = 18:00–00:50 · Insects only spawn on land (not underwater)
+                </div>
+                {displayed.map(ins => (
+                  <div key={ins.name} onClick={() => toggleMuseum(`insect__${ins.name}`)} style={{
+                    display: "flex", gap: 10, alignItems: "flex-start",
+                    padding: "10px 12px", borderRadius: 8, marginBottom: 5, cursor: "pointer",
+                    background: mDone(`insect__${ins.name}`) ? "rgba(251,191,36,0.07)" : "rgba(255,255,255,0.04)",
+                    border: mDone(`insect__${ins.name}`) ? "1px solid rgba(251,191,36,0.25)" : "1px solid rgba(255,255,255,0.07)",
+                    opacity: mDone(`insect__${ins.name}`) ? 0.6 : 1, transition: "all 0.15s",
+                  }}>
+                    <div style={{
+                      width: 20, height: 20, borderRadius: 5, flexShrink: 0, marginTop: 1,
+                      border: mDone(`insect__${ins.name}`) ? "2px solid #fbbf24" : "2px solid #475569",
+                      background: mDone(`insect__${ins.name}`) ? "#fbbf24" : "transparent",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 12, color: "#1a1a1a", fontWeight: "bold"
+                    }}>{mDone(`insect__${ins.name}`) && "✓"}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", gap: 6, alignItems: "center", flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 13, fontWeight: "500", color: "#e8dcc8" }}>{ins.name}</span>
+                        <span style={{ fontSize: 10, padding: "1px 6px", borderRadius: 99, background: "rgba(255,255,255,0.07)", color: RARITY_COLORS[ins.rarity] || "#9ca3af" }}>{ins.rarity}</span>
+                      </div>
+                      <div style={{ marginTop: 4, display: "flex", gap: 5, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 11, color: "#94a3b8" }}>🕐 {ins.time}</span>
+                        <span style={{ fontSize: 11, color: "#94a3b8" }}>·</span>
+                        <span style={{ fontSize: 11, color: ins.weather === "Any" ? "#64748b" : "#f59e0b" }}>{ins.weather === "Any" ? "Any weather" : ins.weather}</span>
+                        <span style={{ fontSize: 11, color: "#94a3b8" }}>·</span>
+                        <span style={{ fontSize: 11, color: ins.season === "All Seasons" ? "#64748b" : "#86efac" }}>{ins.season}</span>
+                      </div>
+                      <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>📍 {ins.location}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+
+          {/* ── GEMS ── */}
+          {museumTab === "gems" && (() => {
+            const gateTypes = ["Wind", "Water", "Earth", "Fire"];
+            return (
+              <div>
+                <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 12 }}>
+                  💎 <b>35 gems total.</b> Found in the mine gates. Wind Gate opens after Water Gate level 40. Earth Gate is in the Cavern. Fire Gate requires Cavern + Earth Gate progression.
+                </div>
+                {gateTypes.map(gate => {
+                  const items = GEMS.filter(g => g.type === gate && (!ms || g.name.toLowerCase().includes(ms)));
+                  if (!items.length) return null;
+                  const doneCount = items.filter(g => mDone(`gem__${g.name}`)).length;
+                  const gColor = GEM_COLORS[gate];
+                  return (
+                    <div key={gate} style={{ marginBottom: 16 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
+                        <div style={{ fontSize: 13, fontWeight: "bold", color: gColor }}>💎 {gate} Gate</div>
+                        <div style={{ fontSize: 11, color: "#64748b" }}>{doneCount}/{items.length}</div>
+                        <div style={{ flex: 1, height: 3, background: "rgba(255,255,255,0.08)", borderRadius: 999, overflow: "hidden" }}>
+                          <div style={{ height: "100%", width: `${Math.round((doneCount/items.length)*100)}%`, background: gColor, borderRadius: 999 }} />
+                        </div>
+                      </div>
+                      {items.map(g => (
+                        <CheckRow key={g.name} label={g.name} sub={g.how}
+                          checked={mDone(`gem__${g.name}`)} onToggle={() => toggleMuseum(`gem__${g.name}`)} />
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })()}
+
+          {/* ── MILESTONES ── */}
+          {museumTab === "milestones" && (
+            <div>
+              <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 14 }}>
+                🎁 Donation milestone rewards — tracked separately from individual items. Mark as received when you collect the reward in-game.
+              </div>
+              <div style={{ background: "rgba(34,211,238,0.06)", border: "1px solid rgba(34,211,238,0.2)", borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
+                <div style={{ fontSize: 12, fontWeight: "bold", color: "#22d3ee", marginBottom: 6 }}>Collection Completion Rewards</div>
+                {MUSEUM_COLLECTIONS.map(col => (
+                  <CheckRow key={col.id} label={`${col.icon} ${col.name} Complete`} sub={`🎁 ${col.reward}`}
+                    checked={mDone(`col__${col.id}`)} onToggle={() => toggleMuseum(`col__${col.id}`)} />
+                ))}
+              </div>
+              <div style={{ fontSize: 13, fontWeight: "bold", color: "#ffd97d", marginBottom: 10 }}>📊 Donation Count Milestones</div>
+              {MUSEUM_MILESTONES.map(m => (
+                <CheckRow key={m.count} label={`${m.count} Donations`} sub={m.reward} warn={m.reward.includes("Soft Bristle")}
+                  checked={mDone(`milestone__${m.count}`)} onToggle={() => toggleMuseum(`milestone__${m.count}`)} />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── OFFERINGS TAB ── */}
+      {activeTab === "offerings" && (
+        <div style={{ maxWidth: 960, margin: "0 auto", padding: "16px 24px" }}>
+          {/* Intro */}
+          <div style={{
+            background: "rgba(251,191,36,0.07)", border: "1px solid rgba(251,191,36,0.2)",
+            borderRadius: 12, padding: "14px 18px", marginBottom: 18
+          }}>
+            <div style={{ fontSize: 13, fontWeight: "bold", color: "#ffd97d", marginBottom: 6 }}>🌸 Lake Temple — Goddess Offerings</div>
+            <div style={{ fontSize: 12, color: "#94a3b8", lineHeight: 1.6 }}>
+              4 altars · 6 bundles each · complete bundles in any order. Visit the Lake Temple (NE of map, 6am–midnight).
+              Each offering item can only be offered once — check your inventory for a tan icon to see what you've already offered.
+            </div>
+            <div style={{ marginTop: 10, display: "flex", gap: 10, flexWrap: "wrap" }}>
+              {ALTARS.map(alt => {
+                const totalBundles = alt.bundles.length;
+                const doneBundles = alt.bundles.filter(b => oDone(`bundle__${alt.id}__${b.id}`)).length;
+                return (
+                  <div key={alt.id} style={{ fontSize: 12, color: alt.color }}>
+                    {alt.icon} {alt.name}: {doneBundles}/{totalBundles}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Altar sections */}
+          {ALTARS.map(altar => {
+            const totalBundles = altar.bundles.length;
+            const doneBundles = altar.bundles.filter(b => oDone(`bundle__${altar.id}__${b.id}`)).length;
+            const altarDone = doneBundles === totalBundles;
+            return (
+              <div key={altar.id} style={{
+                background: altarDone ? `rgba(${altar.color === "#86efac" ? "134,239,172" : altar.color === "#7dd3fc" ? "125,211,252" : altar.color === "#c4b5fd" ? "196,181,253" : altar.color === "#f9a8d4" ? "249,168,212" : "251,191,36"},0.07)` : "rgba(255,255,255,0.04)",
+                border: `1px solid ${altarDone ? altar.color : "rgba(255,255,255,0.09)"}`,
+                borderRadius: 14, marginBottom: 18, overflow: "hidden"
+              }}>
+                {/* Altar header */}
+                <div style={{
+                  padding: "14px 18px", display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap",
+                  borderBottom: "1px solid rgba(255,255,255,0.07)",
+                  background: "rgba(255,255,255,0.03)"
+                }}>
+                  <div style={{ fontSize: 22 }}>{altar.icon}</div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: "bold", color: altar.color }}>{altar.name}</div>
+                    <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>{altar.unlockNote}</div>
+                  </div>
+                  <div style={{ textAlign: "right" }}>
+                    <div style={{ fontSize: 14, fontWeight: "bold", color: altarDone ? altar.color : "#e8dcc8" }}>{doneBundles}/{totalBundles}</div>
+                    {altarDone && <div style={{ fontSize: 10, color: altar.color }}>✓ Complete!</div>}
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                <div style={{ height: 3, background: "rgba(255,255,255,0.06)", overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${Math.round((doneBundles/totalBundles)*100)}%`, background: altar.color, transition: "width 0.4s" }} />
+                </div>
+
+                {/* Reward note */}
+                <div style={{ padding: "8px 18px", fontSize: 11, color: "#fcd34d", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
+                  🎁 <b>Altar Reward:</b> {altar.reward}
+                </div>
+
+                {/* Bundles */}
+                <div style={{ padding: "12px 16px", display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(290px,1fr))", gap: 10 }}>
+                  {altar.bundles.map(bundle => {
+                    const bDone = oDone(`bundle__${altar.id}__${bundle.id}`);
+                    const totalItems = bundle.items.length;
+                    const doneItems = bundle.items.filter(it => oDone(`item__${altar.id}__${bundle.id}__${it.name}`)).length;
+                    return (
+                      <div key={bundle.id} style={{
+                        background: bDone ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)",
+                        border: bDone ? `1px solid ${altar.color}55` : "1px solid rgba(255,255,255,0.07)",
+                        borderRadius: 10, overflow: "hidden"
+                      }}>
+                        {/* Bundle header */}
+                        <div style={{
+                          padding: "10px 13px", display: "flex", justifyContent: "space-between", alignItems: "center",
+                          borderBottom: "1px solid rgba(255,255,255,0.06)",
+                          background: "rgba(255,255,255,0.03)", cursor: "pointer"
+                        }} onClick={() => toggleOffering(`bundle__${altar.id}__${bundle.id}`)}>
+                          <div>
+                            <div style={{ fontSize: 13, fontWeight: "bold", color: bDone ? "#9ca3af" : "#e8dcc8" }}>{bundle.name}</div>
+                            <div style={{ fontSize: 10, color: "#64748b", marginTop: 1 }}>{bundle.choiceNote}</div>
+                          </div>
+                          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
+                            <div style={{ fontSize: 11, color: bDone ? altar.color : "#64748b" }}>{doneItems}/{totalItems}</div>
+                            <div style={{
+                              width: 18, height: 18, borderRadius: 4,
+                              border: bDone ? `2px solid ${altar.color}` : "2px solid #475569",
+                              background: bDone ? altar.color : "transparent",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              fontSize: 11, color: "#1a1a1a", fontWeight: "bold"
+                            }}>{bDone && "✓"}</div>
+                          </div>
+                        </div>
+                        {/* Items */}
+                        <div style={{ padding: "8px 10px" }}>
+                          {bundle.reward && (
+                            <div style={{ fontSize: 10, color: "#fcd34d", marginBottom: 6, fontStyle: "italic" }}>🎁 {bundle.reward}</div>
+                          )}
+                          {bundle.items.map(item => {
+                            const iKey = `item__${altar.id}__${bundle.id}__${item.name}`;
+                            const iDone = oDone(iKey);
+                            return (
+                              <div key={item.name} onClick={() => toggleOffering(iKey)} style={{
+                                display: "flex", gap: 8, alignItems: "flex-start",
+                                padding: "6px 8px", borderRadius: 6, marginBottom: 3, cursor: "pointer",
+                                background: iDone ? "rgba(255,255,255,0.04)" : "transparent",
+                                opacity: iDone ? 0.55 : 1, transition: "all 0.15s"
+                              }}>
+                                <div style={{
+                                  width: 16, height: 16, borderRadius: 3, flexShrink: 0, marginTop: 1,
+                                  border: iDone ? `2px solid ${altar.color}` : "2px solid #374151",
+                                  background: iDone ? altar.color : "transparent",
+                                  display: "flex", alignItems: "center", justifyContent: "center",
+                                  fontSize: 9, color: "#1a1a1a", fontWeight: "bold"
+                                }}>{iDone && "✓"}</div>
+                                <div>
+                                  <span style={{ fontSize: 12, color: iDone ? "#64748b" : "#e8dcc8" }}>
+                                    {item.name} {item.qty && <span style={{ color: "#94a3b8" }}>{item.qty}</span>}
+                                  </span>
+                                  {item.note && (
+                                    <div style={{ fontSize: 10, color: item.note.includes("⚠️") ? "#fcd34d" : item.note.includes("📍") ? "#7dd3fc" : "#4b5563", marginTop: 1 }}>
+                                      {item.note}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── CHARACTER DETAIL MODAL ── */}
+      {char && (
+        <div onClick={() => setSelectedChar(null)} style={{
+          position: "fixed", inset: 0, background: "rgba(0,0,0,0.75)",
+          backdropFilter: "blur(6px)", zIndex: 100,
+          display: "flex", alignItems: "flex-start", justifyContent: "center",
+          padding: "24px 12px", overflowY: "auto"
+        }}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: "linear-gradient(160deg,#1e2a3a 0%,#162030 100%)",
+            border: "1px solid rgba(255,215,100,0.25)", borderRadius: 16,
+            width: "100%", maxWidth: 680, boxShadow: "0 25px 60px rgba(0,0,0,0.6)", overflow: "hidden"
+          }}>
+            <div style={{
+              padding: "18px 22px 14px", background: "rgba(255,255,255,0.04)",
+              borderBottom: "1px solid rgba(255,215,100,0.15)",
+              display: "flex", justifyContent: "space-between", alignItems: "center"
+            }}>
+              <div>
+                <h2 style={{ margin: 0, color: "#ffd97d", fontSize: 19 }}>{char.romanceable ? "💖" : "🤝"} {char.name}</h2>
+                <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>
+                  {char.category} · {char.romanceable ? "Romanceable" : "Friendship only"} · {charProgress(char).done}/{charProgress(char).total} seen
+                </div>
+              </div>
+              <button onClick={() => setSelectedChar(null)} style={{ background: "none", border: "none", color: "#94a3b8", fontSize: 22, cursor: "pointer" }}>✕</button>
+            </div>
+
+            {char.romanceable && (
+              <div style={{ margin: "12px 18px 0", padding: "9px 13px", background: "rgba(236,72,153,0.1)", border: "1px solid rgba(236,72,153,0.2)", borderRadius: 8, fontSize: 11, color: "#f9a8d4" }}>
+                💍 <b>Romance:</b> ♥8 + all events + Locket from Blacksmith &nbsp;·&nbsp; 💍 <b>Marry:</b> ♥10 + all events + House lvl 3 + Diamond Ring
+              </div>
+            )}
+
+            <div style={{ padding: "14px 18px 18px" }}>
+              <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8, fontStyle: "italic" }}>⚠️ Events must trigger in order. Click to check off.</div>
+              {char.events.map((ev, i) => {
+                const done = isComplete(char.name, i);
+                const wb = weatherBadge(ev.weather);
+                return (
+                  <div key={i} onClick={() => toggleEvent(char.name, i)} style={{
+                    display: "flex", gap: 11, alignItems: "flex-start",
+                    padding: "11px 13px", borderRadius: 9, marginBottom: 5, cursor: "pointer",
+                    background: done ? "rgba(251,191,36,0.07)" : "rgba(255,255,255,0.04)",
+                    border: done ? "1px solid rgba(251,191,36,0.28)" : "1px solid rgba(255,255,255,0.07)",
+                    opacity: done ? 0.72 : 1, transition: "all 0.18s",
+                  }}>
+                    <div style={{
+                      width: 20, height: 20, borderRadius: 5, flexShrink: 0,
+                      border: done ? "2px solid #fbbf24" : "2px solid #475569",
+                      background: done ? "#fbbf24" : "transparent",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      marginTop: 1, fontSize: 12, color: "#1a1a1a", fontWeight: "bold"
+                    }}>{done && "✓"}</div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 11, fontWeight: "bold", background: "rgba(139,92,246,0.3)", border: "1px solid rgba(139,92,246,0.4)", padding: "1px 7px", borderRadius: 99, color: "#c4b5fd" }}>{heartLabel(ev.heart)}</span>
+                        <span style={{ fontSize: 13, color: done ? "#9ca3af" : "#e8dcc8", fontWeight: "bold" }}>{ev.location}</span>
+                      </div>
+                      <div style={{ marginTop: 4, display: "flex", gap: 5, flexWrap: "wrap" }}>
+                        <span style={{ fontSize: 11, padding: "1px 7px", borderRadius: 99, background: "rgba(255,255,255,0.07)", color: "#94a3b8" }}>🕐 {ev.time}</span>
+                        <span style={{ fontSize: 11, padding: "1px 7px", borderRadius: 99, background: "rgba(255,255,255,0.07)", color: "#94a3b8" }}>{wb.icon} {ev.weather}</span>
+                        {ev.season !== "Any" && <span style={{ fontSize: 11, padding: "1px 7px", borderRadius: 99, background: "rgba(134,239,172,0.08)", color: "#86efac" }}>🗓️ {ev.season}</span>}
+                      </div>
+                      {ev.notes && <div style={{ marginTop: 5, fontSize: 11, color: ev.notes.includes("⚠️") ? "#fcd34d" : "#64748b", fontStyle: "italic" }}>{ev.notes}</div>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{ padding: "10px 18px 14px", borderTop: "1px solid rgba(255,255,255,0.07)" }}>
+              {(() => {
+                const { done, total } = charProgress(char);
+                const p = total ? Math.round((done / total) * 100) : 0;
+                return <>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, fontSize: 11, color: "#94a3b8" }}>
+                    <span>{done}/{total} events seen</span><span>{p}%</span>
+                  </div>
+                  <div style={{ height: 4, background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${p}%`, background: p === 100 ? "#fbbf24" : "linear-gradient(90deg,#3b82f6,#ec4899)", borderRadius: 999, transition: "width 0.4s" }} />
+                  </div>
+                </>;
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
