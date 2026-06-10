@@ -1178,11 +1178,56 @@ function CheckRow({ label, sub, checked, onToggle, warn }) {
   );
 }
 
+function CharCard({ c, charProgress, isComplete, favorites, toggleFavorite, setSelectedChar }) {
+  const { done, total } = charProgress(c);
+  const allDone = done === total;
+  const pctC = total ? Math.round((done / total) * 100) : 0;
+  const isFav = !!favorites[c.name];
+  return (
+    <div onClick={() => setSelectedChar(c.name)} style={{
+      background: allDone ? "linear-gradient(135deg,rgba(251,191,36,0.13),rgba(236,72,153,0.08))" : "rgba(255,255,255,0.05)",
+      border: isFav ? "1px solid rgba(251,191,36,0.6)" : allDone ? "1px solid rgba(251,191,36,0.45)" : "1px solid rgba(255,255,255,0.09)",
+      borderRadius: 11, padding: "13px 15px", cursor: "pointer", transition: "all 0.2s", position: "relative",
+    }}>
+      {/* Star button */}
+      <button
+        onClick={e => toggleFavorite(e, c.name)}
+        title={isFav ? "Remove from favorites" : "Add to favorites"}
+        style={{
+          position: "absolute", top: 10, right: 10,
+          background: "none", border: "none", cursor: "pointer",
+          fontSize: 16, lineHeight: 1, padding: 2,
+          color: isFav ? "#fbbf24" : "#374151",
+          transition: "color 0.15s, transform 0.15s",
+          transform: isFav ? "scale(1.15)" : "scale(1)",
+        }}
+      >
+        {isFav ? "⭐" : "☆"}
+      </button>
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", paddingRight: 24 }}>
+        <div>
+          <div style={{ fontWeight: "bold", fontSize: 14, color: "#ffd97d" }}>{c.romanceable ? "💖" : "🤝"} {c.name}</div>
+          <div style={{ fontSize: 11, color: "#64748b", marginTop: 1 }}>{c.category} · {total} events</div>
+        </div>
+        <div style={{ textAlign: "right" }}>
+          <div style={{ fontSize: 16, fontWeight: "bold", color: allDone ? "#fbbf24" : "#e8dcc8" }}>{done}/{total}</div>
+          {allDone && <div style={{ fontSize: 10, color: "#fbbf24" }}>✓ Done!</div>}
+        </div>
+      </div>
+      <div style={{ marginTop: 9, height: 3, background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: `${pctC}%`, background: allDone ? "#fbbf24" : "linear-gradient(90deg,#3b82f6,#8b5cf6)", borderRadius: 999, transition: "width 0.4s" }} />
+      </div>
+    </div>
+  );
+}
+
 export default function CoralIslandTracker() {
   const [activeTab, setActiveTab] = useState("scenes");
   const [completed, setCompleted] = useState({});
   const [museumDone, setMuseumDone] = useState({});
   const [offeringsDone, setOfferingsDone] = useState({});
+  const [favorites, setFavorites] = useState({});
   // scenes tab state
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("All");
@@ -1200,6 +1245,8 @@ export default function CoralIslandTracker() {
       if (m) setMuseumDone(JSON.parse(m));
       const o = localStorage.getItem(OFFERINGS_STORAGE_KEY);
       if (o) setOfferingsDone(JSON.parse(o));
+      const f = localStorage.getItem("ci_favorites_v1");
+      if (f) setFavorites(JSON.parse(f));
     } catch {}
   }, []);
 
@@ -1214,6 +1261,12 @@ export default function CoralIslandTracker() {
   function saveOfferings(next) {
     setOfferingsDone(next);
     try { localStorage.setItem(OFFERINGS_STORAGE_KEY, JSON.stringify(next)); } catch {}
+  }
+  function toggleFavorite(e, name) {
+    e.stopPropagation();
+    const next = { ...favorites, [name]: !favorites[name] };
+    setFavorites(next);
+    try { localStorage.setItem("ci_favorites_v1", JSON.stringify(next)); } catch {}
   }
 
   function toggleEvent(charName, idx) {
@@ -1332,33 +1385,25 @@ export default function CoralIslandTracker() {
             ))}
           </div>
 
+          {/* ── FAVORITES SECTION ── */}
+          {Object.values(favorites).some(Boolean) && !search && (
+            <div style={{ marginBottom: 22 }}>
+              <div style={{ fontSize: 12, color: "#fbbf24", fontWeight: "bold", marginBottom: 8, letterSpacing: 0.5 }}>
+                ⭐ Favorites
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(250px,1fr))", gap: 10 }}>
+                {CHARACTERS.filter(c => favorites[c.name]).map(c => <CharCard key={c.name} c={c} charProgress={charProgress} isComplete={isComplete} favorites={favorites} toggleFavorite={toggleFavorite} setSelectedChar={setSelectedChar} />)}
+              </div>
+              <div style={{ height: 1, background: "rgba(255,215,100,0.15)", margin: "18px 0 6px" }} />
+              <div style={{ fontSize: 12, color: "#64748b", fontWeight: "bold", marginBottom: 8, letterSpacing: 0.5 }}>
+                All Characters
+              </div>
+            </div>
+          )}
+
+          {/* ── MAIN GRID ── */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(250px,1fr))", gap: 10 }}>
-            {filtered.map(c => {
-              const { done, total } = charProgress(c);
-              const allDone = done === total;
-              const pctC = total ? Math.round((done / total) * 100) : 0;
-              return (
-                <div key={c.name} onClick={() => setSelectedChar(c.name)} style={{
-                  background: allDone ? "linear-gradient(135deg,rgba(251,191,36,0.13),rgba(236,72,153,0.08))" : "rgba(255,255,255,0.05)",
-                  border: allDone ? "1px solid rgba(251,191,36,0.45)" : "1px solid rgba(255,255,255,0.09)",
-                  borderRadius: 11, padding: "13px 15px", cursor: "pointer", transition: "all 0.2s",
-                }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                    <div>
-                      <div style={{ fontWeight: "bold", fontSize: 14, color: "#ffd97d" }}>{c.romanceable ? "💖" : "🤝"} {c.name}</div>
-                      <div style={{ fontSize: 11, color: "#64748b", marginTop: 1 }}>{c.category} · {total} events</div>
-                    </div>
-                    <div style={{ textAlign: "right" }}>
-                      <div style={{ fontSize: 16, fontWeight: "bold", color: allDone ? "#fbbf24" : "#e8dcc8" }}>{done}/{total}</div>
-                      {allDone && <div style={{ fontSize: 10, color: "#fbbf24" }}>✓ Done!</div>}
-                    </div>
-                  </div>
-                  <div style={{ marginTop: 9, height: 3, background: "rgba(255,255,255,0.1)", borderRadius: 999, overflow: "hidden" }}>
-                    <div style={{ height: "100%", width: `${pctC}%`, background: allDone ? "#fbbf24" : "linear-gradient(90deg,#3b82f6,#8b5cf6)", borderRadius: 999, transition: "width 0.4s" }} />
-                  </div>
-                </div>
-              );
-            })}
+            {filtered.map(c => <CharCard key={c.name} c={c} charProgress={charProgress} isComplete={isComplete} favorites={favorites} toggleFavorite={toggleFavorite} setSelectedChar={setSelectedChar} />)}
           </div>
         </div>
       )}
